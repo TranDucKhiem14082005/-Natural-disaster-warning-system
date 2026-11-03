@@ -33,7 +33,11 @@ class AlertRequest extends FormRequest
 
             'area' => [$required, 'array'],
             'area.type' => ['required_with:area', 'in:polygon,circle'],
-            'area.coordinates' => ['required_if:area.type,polygon', 'array', 'min:3', 'max:500'],
+            'area.coordinates' => ['required_if:area.type,polygon', 'array', 'min:3', 'max:500', function ($attribute, $value, $fail) {
+                if (is_array($value) && ! $this->enclosesArea($value)) {
+                    $fail('Vùng đa giác phải có ít nhất 3 điểm không thẳng hàng.');
+                }
+            }],
             'area.coordinates.*' => ['array', 'size:2'],
             'area.coordinates.*.0' => ['numeric', 'between:-180,180'],
             'area.coordinates.*.1' => ['numeric', 'between:-90,90'],
@@ -42,5 +46,25 @@ class AlertRequest extends FormRequest
             'area.center.lng' => ['required_if:area.type,circle', 'numeric', 'between:-180,180'],
             'area.radius_m' => ['required_if:area.type,circle', 'integer', 'between:100,500000'],
         ];
+    }
+
+    /** Shoelace area of the ring; a zero-area polygon contains no point, so geofencing would never match. */
+    private function enclosesArea(array $points): bool
+    {
+        foreach ($points as $p) {
+            if (! is_array($p) || ! is_numeric($p[0] ?? null) || ! is_numeric($p[1] ?? null)) {
+                return true; // malformed points are reported by the per-point rules
+            }
+        }
+
+        $sum = 0.0;
+        $n = count($points);
+        for ($i = 0; $i < $n; $i++) {
+            [$x1, $y1] = $points[$i];
+            [$x2, $y2] = $points[($i + 1) % $n];
+            $sum += $x1 * $y2 - $x2 * $y1;
+        }
+
+        return abs($sum) > 1e-12;
     }
 }

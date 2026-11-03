@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\AlertStatus;
 use App\Models\Concerns\ScopedToRegion;
+use App\Support\DateFilter;
 use App\Support\Geo;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -142,7 +143,7 @@ class Alert extends Model
                 default => $q->where('status', $v),
             })
             ->when($filters['from'] ?? null, fn ($q, $v) => $q->where('published_at', '>=', $v))
-            ->when($filters['to'] ?? null, fn ($q, $v) => $q->where('published_at', '<=', $v))
+            ->when($filters['to'] ?? null, fn ($q, $v) => $q->where('published_at', '<=', DateFilter::until($v)))
             ->when(isset($filters['lat'], $filters['lng']), function ($q) use ($filters) {
                 $lat = (float) $filters['lat'];
                 $lng = (float) $filters['lng'];

@@ -54,10 +54,12 @@ class UserController extends Controller
             'is_active' => ['sometimes', 'boolean'],
             'password' => ['sometimes', Password::min(8)],
         ]);
-        abort_if($user->is($request->user()) && (isset($data['role']) || ($data['is_active'] ?? true) === false), 422, 'Không thể tự đổi vai trò hoặc khoá chính mình.');
+        // boolean() also covers form values such as "0" / "false", not only JSON false.
+        $deactivating = $request->has('is_active') && ! $request->boolean('is_active');
+        abort_if($user->is($request->user()) && (isset($data['role']) || $deactivating), 422, 'Không thể tự đổi vai trò hoặc khoá chính mình.');
 
         $user->update($data);
-        if (($data['is_active'] ?? true) === false) {
+        if ($deactivating) {
             $user->tokens()->delete();
         }
 
