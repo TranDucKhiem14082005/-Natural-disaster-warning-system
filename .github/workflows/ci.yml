@@ -1,0 +1,82 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    name: Backend - lint + test (MariaDB 10.4)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: Backend
+    services:
+      mariadb:
+        image: mariadb:10.4.32
+        env:
+          MARIADB_ROOT_PASSWORD: root
+          MARIADB_DATABASE: disaster_warning_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot -proot --silent"
+          --health-interval=5s --health-timeout=5s --health-retries=30
+    env:
+      DB_HOST: 127.0.0.1
+      DB_PORT: 3306
+      DB_USERNAME: root
+      DB_PASSWORD: root
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: pdo_mysql, bcmath, intl, zip, pcntl
+          coverage: none
+
+      - name: Cache Composer
+        uses: actions/cache@v4
+        with:
+          path: ~/.composer/cache/files
+          key: composer-${{ hashFiles('Backend/composer.lock') }}
+          restore-keys: composer-
+
+      - run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Prepare .env
+        run: cp .env.example .env && php artisan key:generate
+
+      - name: Lint (Pint)
+        run: vendor/bin/pint --test
+
+      - name: Test (phpunit.xml uses DB disaster_warning_test)
+        run: php artisan test
+
+  docker:
+    name: Infra - docker compose build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Dummy secrets for compose interpolation
+        working-directory: Infra
+        run: |
+          cp .env.example .env
+          sed -i "s|^APP_KEY=.*|APP_KEY=base64:$(openssl rand -base64 32)|" .env
+          sed -i "s|^DB_PASSWORD=.*|DB_PASSWORD=ci|; s|^DB_ROOT_PASSWORD=.*|DB_ROOT_PASSWORD=ci|" .env
+          sed -i "s|^REVERB_APP_KEY=.*|REVERB_APP_KEY=ci|; s|^REVERB_APP_SECRET=.*|REVERB_APP_SECRET=ci|" .env
+
+      - name: Validate compose file
+        working-directory: Infra
+        run: docker compose config --quiet
+
+      - name: Build images
+        working-directory: Infra
+        run: docker compose build app nginx

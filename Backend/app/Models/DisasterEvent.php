@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\DateFilter;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -60,6 +61,6 @@ class DisasterEvent extends Model
             ->when($filters['min_severity'] ?? null, fn ($q, $v) => $q->where('severity', '>=', $v))
             ->when($filters['status'] ?? null, fn ($q, $v) => $q->where('status', $v))
             ->when($filters['from'] ?? null, fn ($q, $v) => $q->where('started_at', '>=', $v))
-            ->when($filters['to'] ?? null, fn ($q, $v) => $q->where('started_at', '<=', $v));
+            ->when($filters['to'] ?? null, fn ($q, $v) => $q->where('started_at', '<=', DateFilter::until($v)));
     }
 }

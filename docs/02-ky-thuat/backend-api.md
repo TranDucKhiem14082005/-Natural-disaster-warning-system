@@ -8,6 +8,7 @@ Base URL: `http://localhost:8000/api/v1`. Xac thuc: header `Authorization: Beare
 - Vai tro: `citizen`, `rescuer`, `officer`, `admin`. Khach = khong gui token.
 - Dia ban: officer co `region_id` chi quan ly ban ghi cung `region_id` hoac `region_id = null`. Officer khong co `region_id` va admin quan ly tat ca.
 - Loi validate: `422` + `errors`. Sai quyen: `403`. Khong thay / khong duoc xem: `404`.
+- Loc thoi gian `from`/`to`: `to` chi co ngay (`YYYY-MM-DD`) bao gom ca ngay do (den 23:59:59).
 
 ## Vung anh huong canh bao (`area`)
 
@@ -16,7 +17,7 @@ Base URL: `http://localhost:8000/api/v1`. Xac thuc: header `Authorization: Beare
 { "type": "polygon", "coordinates": [[108.20, 16.04], [108.21, 16.04], [108.21, 16.05], [108.20, 16.05]] }
 ```
 
-Hinh tron duoc xap xi thanh da giac 32 dinh de dung `ST_Contains`. Response tra `area_geojson` (Polygon) de ve tren Leaflet.
+Da giac phai co it nhat 3 diem khong thang hang (dien tich > 0), neu khong tra `422`. Hinh tron duoc xap xi thanh da giac 32 dinh de dung `ST_Contains`. Response tra `area_geojson` (Polygon) de ve tren Leaflet.
 
 ## Vong doi canh bao
 
