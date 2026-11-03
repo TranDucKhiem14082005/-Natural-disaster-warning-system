@@ -2,3 +2,7 @@
 .env
 .env.*
 !.env.example
+
+# Claude Code config (local only)
+.claude/
+CLAUDE.md
