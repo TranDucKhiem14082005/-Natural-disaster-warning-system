@@ -6,6 +6,7 @@ use App\Enums\SosStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Alert;
 use App\Models\SosRequest;
+use App\Support\DateFilter;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -21,7 +22,7 @@ class StatsController extends Controller
             'disaster_type_id' => ['nullable', 'integer'],
         ]);
         $from = $data['from'] ?? now()->subYear()->startOfMonth();
-        $to = $data['to'] ?? now();
+        $to = isset($data['to']) ? DateFilter::until($data['to']) : now();
 
         $alerts = fn () => Alert::query()
             ->whereNotNull('published_at')

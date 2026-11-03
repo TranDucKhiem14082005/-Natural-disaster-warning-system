@@ -92,4 +92,32 @@ class AlertLifecycleTest extends ApiTestCase
             ->assertUnprocessable()
             ->assertJsonValidationErrors('area.coordinates');
     }
+
+    public function test_zero_area_polygon_is_rejected(): void
+    {
+        $this->actingAs($this->makeUser(Role::Admin));
+
+        foreach ([
+            [[108.2, 16.0], [108.3, 16.1], [108.2, 16.0]],
+            [[108.2, 16.0], [108.25, 16.05], [108.3, 16.1]],
+        ] as $coordinates) {
+            $this->postJson('/api/v1/manage/alerts', $this->alertPayload(['area' => ['type' => 'polygon', 'coordinates' => $coordinates]]))
+                ->assertUnprocessable()
+                ->assertJsonValidationErrors('area.coordinates');
+        }
+
+        $this->postJson('/api/v1/manage/alerts', $this->alertPayload(['area' => ['type' => 'polygon', 'coordinates' => [[108.2, 16.0], [108.3, 16.0], [108.25, 16.1]]]]))
+            ->assertCreated();
+    }
+
+    public function test_date_only_to_filter_includes_that_day(): void
+    {
+        $this->actingAs($this->makeUser(Role::Admin));
+        $id = $this->postJson('/api/v1/manage/alerts', $this->alertPayload())->json('id');
+        $this->postJson("/api/v1/manage/alerts/{$id}/publish")->assertOk();
+        $today = now()->toDateString();
+
+        $this->getJson("/api/v1/alerts?from={$today}&to={$today}")->assertJsonPath('total', 1);
+        $this->getJson("/api/v1/manage/stats?from={$today}&to={$today}")->assertJsonPath('alerts.total', 1);
+    }
 }
