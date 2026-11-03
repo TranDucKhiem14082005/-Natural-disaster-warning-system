@@ -43,4 +43,21 @@ class AuthTest extends ApiTestCase
         $this->actingAs($this->makeUser())->getJson('/api/v1/manage/alerts')->assertForbidden();
         $this->actingAs($this->makeUser(Role::Officer))->getJson('/api/v1/admin/users')->assertForbidden();
     }
+
+    public function test_form_value_zero_locks_user_and_admin_cannot_lock_self(): void
+    {
+        $admin = $this->makeUser(Role::Admin);
+        $citizen = $this->makeUser();
+        $citizen->createToken('api');
+        $this->actingAs($admin);
+
+        $this->patch("/api/v1/admin/users/{$admin->id}", ['is_active' => '0'], ['Accept' => 'application/json'])
+            ->assertUnprocessable();
+        $this->assertTrue($admin->fresh()->is_active);
+
+        $this->patch("/api/v1/admin/users/{$citizen->id}", ['is_active' => '0'], ['Accept' => 'application/json'])
+            ->assertOk();
+        $this->assertFalse($citizen->fresh()->is_active);
+        $this->assertSame(0, $citizen->tokens()->count());
+    }
 }
