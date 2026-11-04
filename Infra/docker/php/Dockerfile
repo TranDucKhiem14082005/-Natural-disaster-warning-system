@@ -31,8 +31,23 @@ USER www-data
 ENTRYPOINT ["entrypoint"]
 CMD ["php-fpm"]
 
-# ---- Nginx: serves public/ and proxies PHP to app, WebSocket to reverb ----
+# ---- React SPA build ----
+FROM node:22-alpine AS frontend
+
+WORKDIR /src
+COPY Frontend/package.json Frontend/package-lock.json ./
+RUN npm ci --no-audit --no-fund
+
+COPY Frontend/ ./
+# Reverb public key is baked into the bundle; empty = realtime off.
+ARG VITE_REVERB_APP_KEY=
+ARG VITE_MAP_TILE_URL=
+ENV VITE_REVERB_APP_KEY=$VITE_REVERB_APP_KEY VITE_MAP_TILE_URL=$VITE_MAP_TILE_URL
+RUN npm run build
+
+# ---- Nginx: serves the SPA, proxies /api to app (PHP), WebSocket to reverb ----
 FROM nginx:1.27-alpine AS web
 
 COPY Infra/docker/nginx/default.conf /etc/nginx/conf.d/default.conf
 COPY Backend/public /var/www/html/public
+COPY --from=frontend /src/dist /var/www/html/spa
