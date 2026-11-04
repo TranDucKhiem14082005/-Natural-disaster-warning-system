@@ -62,28 +62,27 @@ Mở **http://localhost:5173**.
 Vite proxy `/api`, `/storage` sang `127.0.0.1:8000` và `/app` (WebSocket) sang Reverb `127.0.0.1:8080`, nên không cần cấu hình CORS.
 Nếu để trống `VITE_REVERB_APP_KEY` thì app vẫn chạy, chỉ tắt realtime (tải lại trang để thấy dữ liệu mới).
 
-## Tài khoản demo (mật khẩu `password`)
+## 4 cổng theo vai trò (mật khẩu demo `password`)
 
-Trang đăng nhập có sẵn nút đăng nhập nhanh từng tài khoản.
+Đăng nhập xong, mỗi vai trò được đưa thẳng về cổng của mình (vào nhầm cổng thì tự chuyển về). Trang đăng nhập có nút đăng nhập nhanh.
 
-| Email | Vai trò | Xem được |
-|---|---|---|
-| `citizen@demo.vn` | Người dân, nhà nằm trong vùng cảnh báo | Trang của tôi, thông báo, gửi báo cáo |
-| `outsider@demo.vn` | Người dân ở Hà Nội, ngoài vùng | Dùng để so sánh: không nhận thông báo |
-| `rescuer@demo.vn` | Đội cứu hộ | Điều phối SOS (SOS được giao) |
-| `officer@demo.vn` | Cán bộ Đà Nẵng | Quản lý cảnh báo, duyệt báo cáo, SOS, thống kê |
-| `admin@demo.vn` | Admin | Như cán bộ, thêm người dùng, danh mục, nhật ký |
+| Cổng | Đường dẫn | Tài khoản | Dành cho |
+|---|---|---|---|
+| Công khai + người dân | `/`, `/me/*` | `citizen@demo.vn` (nhà trong vùng cảnh báo), `outsider@demo.vn` (Hà Nội, ngoài vùng) | Trang chủ kiểm tra "Khu vực của bạn", bản đồ, cảnh báo, trú ẩn/sơ tán, SOS một chạm, báo cáo, "Của tôi" |
+| Đội cứu hộ | `/rescuer/*` | `rescuer@demo.vn` | Nhiệm vụ được giao, chi tiết + chỉ đường, bản đồ nhiệm vụ, lịch sử |
+| Cán bộ | `/officer/*` | `officer@demo.vn` (Khánh Hoà) | Tổng quan điều hành, điều phối SOS, cảnh báo, duyệt báo cáo, sự kiện, trú ẩn, thống kê |
+| Quản trị | `/admin/*` | `admin@demo.vn` | Tổng quan hệ thống, người dùng, danh mục, nhật ký; dùng được toàn bộ cổng cán bộ |
 
 ## Kịch bản demo
 
-1. **Khách**: trang chủ -> "Tôi có đang ở vùng nguy hiểm?" -> Bản đồ (bật/tắt lớp) -> Cảnh báo (lọc loại, mức độ, thời gian, "Gần tôi").
-2. **Cán bộ** (`officer`): Quản lý -> Cảnh báo -> **+ Tạo cảnh báo** -> chọn loại (hướng dẫn tự điền theo mẫu) -> bấm lên bản đồ để vẽ đa giác (hoặc chọn "Tâm + bán kính") -> Lưu nháp -> **Phát hành**.
-3. Mở cửa sổ ẩn danh, đăng nhập `citizen` trước bước 2: sau khi phát hành sẽ hiện **toast cảnh báo realtime** + chuông thông báo tăng. `outsider` không nhận gì.
-4. **Sơ tán**: menu Trú ẩn hoặc nút "Tuyến sơ tán gần nhất" trên Bản đồ.
-   Lưu ý: trong dữ liệu seed, cả 3 điểm trú ẩn đều nằm trong vùng cảnh báo bán kính 3km, nên API trả "Không tìm thấy điểm trú ẩn".
-   Để demo, vào Quản lý -> Điểm trú ẩn thêm 1 điểm nằm ngoài vùng đỏ, rồi thử lại.
-5. **SOS**: bấm nút đỏ **SOS** (không cần đăng nhập) -> gửi -> trang theo dõi theo mã. Đăng nhập `officer` ở cửa sổ khác -> Điều phối SOS -> chọn yêu cầu -> Giao cho đội cứu hộ / chuyển bước. Trang theo dõi của người gửi **tự đổi trạng thái**.
-6. Kết thúc cảnh báo -> Sự kiện -> mở sự kiện -> **Phát lại diễn biến**; Quản lý -> Thống kê.
+1. **Khách**: trang chủ -> "Kiểm tra vị trí của tôi" -> Bản đồ (bật/tắt lớp) -> Cảnh báo (lọc loại, mức độ, thời gian, "Gần tôi").
+2. **Cán bộ** (`officer`): Cảnh báo -> **Tạo cảnh báo** -> chọn loại (hướng dẫn tự điền theo mẫu) -> vẽ vùng (đa giác hoặc tâm + bán kính) -> Lưu nháp -> **Phát hành**.
+3. Mở cửa sổ ẩn danh, đăng nhập `citizen` trước bước 2: sau khi phát hành sẽ hiện **banner cảnh báo realtime** + chuông thông báo tăng. `outsider` không nhận gì.
+4. **Sơ tán**: Trú ẩn -> Tuyến sơ tán (hoặc nút trên Bản đồ). Dữ liệu demo đặt ở Nha Trang; ĐH Khánh Hoà nằm ngoài vùng ngập Ngọc Hiệp để làm đích.
+5. **SOS**: bấm nút đỏ **SOS** (không cần đăng nhập) -> gửi -> trang theo dõi theo mã. `officer` -> Điều phối SOS -> giao cho đội cứu hộ. `rescuer` -> Nhiệm vụ -> **Bắt đầu cứu hộ** -> **Đã an toàn**. Trang theo dõi của người gửi **tự đổi trạng thái**.
+6. Kết thúc cảnh báo -> Sự kiện -> mở sự kiện -> **Phát lại diễn biến**; cán bộ -> Thống kê.
+
+Ảnh nền bản đồ mặc định lấy từ `tile.openstreetmap.de` (một số nhà mạng VN chặn `*.openstreetmap.org`); đổi bằng `VITE_MAP_TILE_URL`.
 
 ## Lệnh
 
@@ -98,14 +97,15 @@ npm run preview     # xem bản build
 
 ```
 src/
-├── components/      # UI dùng chung (ui.tsx, layout, require-role, map/)
-├── features/        # theo chức năng: alerts, events, map, shelters, reports, sos,
-│                    # guides, profile, dashboard, notifications, manage (cán bộ), admin
+├── components/      # ui/ (design system), map/, shell/ (logo, chuông, menu tài khoản), require-role
+├── layouts/         # public-layout (khách + người dân), rescuer-layout, console-layout (cán bộ + quản trị)
+├── features/        # theo chức năng: overview, alerts, events, map, shelters, reports, sos, guides,
+│                    # citizen, profile, notifications, auth, rescuer, manage (cán bộ), admin
 ├── hooks/           # use-fetch, use-geolocation, use-catalog, use-debounced
 ├── services/        # api.ts (fetch + Bearer token), echo.ts (Reverb)
-├── store/           # auth-context (đăng nhập, vai trò)
+├── store/           # auth-context (đăng nhập, vai trò), notifications-context (chuông + banner realtime)
 ├── types/           # kiểu dữ liệu khớp response Laravel
-└── utils/           # nhãn tiếng Việt, định dạng, nén ảnh trước khi upload
+└── utils/           # nhãn tiếng Việt, định dạng, roles (cổng theo vai trò), directions (OSRM), nén ảnh
 ```
 
 Quyền trên giao diện chỉ để ẩn/hiện; mọi kiểm tra quyền thật nằm ở backend.

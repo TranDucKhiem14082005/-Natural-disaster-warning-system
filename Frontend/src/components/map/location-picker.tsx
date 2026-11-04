@@ -1,4 +1,5 @@
 import { Marker } from 'react-leaflet';
+import { LocateFixed } from 'lucide-react';
 import { BaseMap, FlyTo, MapClick, pinIcon, DEFAULT_CENTER } from './base-map';
 import { Button } from '../ui';
 import { useGeolocation, type LatLng } from '../../hooks/use-geolocation';
@@ -10,10 +11,10 @@ export function LocationPicker({ value, onChange, className = 'h-72' }: { value:
   return (
     <div className="space-y-2">
       <div className="flex flex-wrap items-center gap-2 text-sm">
-        <Button variant="secondary" onClick={() => geo.locate().then(onChange).catch(() => {})} disabled={geo.locating}>
-          {geo.locating ? 'Đang định vị...' : '📍 Dùng vị trí hiện tại'}
+        <Button variant="secondary" icon={LocateFixed} loading={geo.locating} onClick={() => geo.locate().then(onChange).catch(() => {})}>
+          {geo.locating ? 'Đang định vị...' : 'Dùng vị trí hiện tại'}
         </Button>
-        <span className="text-slate-600">
+        <span className="tabular-nums text-slate-600">
           {value ? `${value.lat.toFixed(5)}, ${value.lng.toFixed(5)}` : 'Bấm vào bản đồ để chọn vị trí'}
         </span>
         {geo.error && <span className="text-red-600">{geo.error}</span>}
@@ -21,7 +22,8 @@ export function LocationPicker({ value, onChange, className = 'h-72' }: { value:
       <BaseMap center={value ? [value.lat, value.lng] : DEFAULT_CENTER} className={className}>
         <MapClick onClick={(e) => onChange({ lat: e.latlng.lat, lng: e.latlng.lng })} />
         {value && <Marker position={[value.lat, value.lng]} icon={pinIcon('#dc2626')} />}
-        <FlyTo position={geo.position ? [geo.position.lat, geo.position.lng] : null} />
+        {/* Follows values set from outside (GPS, saved location) without re-centering on every map click. */}
+        <FlyTo position={value ? [value.lat, value.lng] : null} zoom={15} />
       </BaseMap>
     </div>
   );
