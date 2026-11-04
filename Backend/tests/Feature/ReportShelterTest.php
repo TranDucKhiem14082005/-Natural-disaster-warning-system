@@ -54,6 +54,26 @@ class ReportShelterTest extends ApiTestCase
             ->assertJsonPath('route.provider', 'straight_line');
     }
 
+    public function test_citizen_dashboard_suggests_safe_shelter_within_radius(): void
+    {
+        Shelter::create(['name' => 'Trong vùng', 'lat' => self::LAT + 0.001, 'lng' => self::LNG, 'capacity' => 100]);
+        $target = Shelter::create(['name' => 'Ngoài vùng', 'lat' => self::LAT + 0.05, 'lng' => self::LNG, 'capacity' => 100]);
+        Shelter::create(['name' => 'Quá xa', 'lat' => self::LAT + 3, 'lng' => self::LNG, 'capacity' => 100]);
+
+        $this->actingAs($this->makeUser(Role::Officer, $this->danang));
+        $id = $this->postJson('/api/v1/manage/alerts', $this->alertPayload())->json('id');
+        $this->postJson("/api/v1/manage/alerts/{$id}/publish");
+
+        $citizen = $this->makeUser(Role::Citizen);
+        $citizen->locations()->create(['label' => 'Nhà', 'lat' => self::LAT, 'lng' => self::LNG]);
+        $citizen->locations()->create(['label' => 'Xa', 'lat' => self::LAT + 3.2, 'lng' => self::LNG]);
+
+        $this->actingAs($citizen)->getJson('/api/v1/dashboard')
+            ->assertOk()
+            ->assertJsonPath('locations.0.nearest_shelter.id', $target->id)
+            ->assertJsonPath('locations.1.nearest_shelter.name', 'Quá xa');
+    }
+
     public function test_shelter_occupancy_cannot_exceed_capacity(): void
     {
         $shelter = Shelter::create(['name' => 'A', 'lat' => self::LAT, 'lng' => self::LNG, 'capacity' => 10, 'region_id' => $this->danang->id]);

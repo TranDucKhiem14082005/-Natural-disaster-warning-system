@@ -12,6 +12,7 @@ use App\Models\Report;
 use App\Models\Shelter;
 use App\Models\SosRequest;
 use App\Models\User;
+use App\Services\EvacuationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -43,13 +44,14 @@ class DashboardController extends Controller
     private function citizen(User $user): array
     {
         $locations = $user->locations;
+        $evacuation = app(EvacuationService::class);
 
         return [
             'role' => 'citizen',
             'locations' => $locations->map(fn ($loc) => [
                 'location' => $loc,
                 'alerts' => Alert::with('type:id,code,name,icon')->active()->containingPoint($loc->lat, $loc->lng)->get(),
-                'nearest_shelter' => Shelter::available()->nearest($loc->lat, $loc->lng)->first(),
+                'nearest_shelter' => $evacuation->nearestSafeShelter($loc->lat, $loc->lng),
             ]),
             'unread_notifications' => $user->unreadNotifications()->count(),
             'open_sos' => SosRequest::where('user_id', $user->id)->where('status', '!=', SosStatus::Safe)->get(),
