@@ -3,7 +3,10 @@
 .claude
 .github
 docs
-Frontend
+Frontend/node_modules
+Frontend/dist
+Frontend/.env
+Frontend/.env.*
 Infra/.env
 *.md
 

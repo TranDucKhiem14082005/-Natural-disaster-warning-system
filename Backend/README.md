@@ -25,12 +25,30 @@ php artisan reverb:start     # WebSocket: ws://localhost:8080
 php artisan schedule:work    # lay du lieu Open-Meteo (1h) va USGS (30 phut)
 ```
 
+## Chay bang Docker Compose
+
+Can Docker Desktop (WSL2). Trong thu muc `Backend/`, can co `.env` (APP_KEY, REVERB_*) nhu buoc tren:
+
+```bash
+docker compose up -d --build                     # build + tu chay migrate
+docker compose exec app php artisan db:seed      # nap du lieu demo (1 lan)
+```
+
+| Dich vu | URL |
+|---|---|
+| Web / API (nginx + php-fpm) | http://localhost:8000 |
+| WebSocket (Reverb) | ws://localhost:8080 |
+| phpMyAdmin (user `disaster` / `secret`) | http://localhost:8081 |
+| MariaDB 10.11 (tu may host) | `127.0.0.1:3307` |
+
+`queue` va `scheduler` chay thanh container rieng. Doi cong/mat khau bang bien `APP_PORT`, `REVERB_PUBLIC_PORT`, `PMA_PORT`, `DB_PUBLIC_PORT`, `DOCKER_DB_PASSWORD` trong `.env`. Dung: `docker compose down` (them `-v` de xoa du lieu DB).
+
 ## Tai khoan demo (mat khau: `password`)
 
 | Email | Vai tro |
 |---|---|
 | admin@demo.vn | Admin |
-| officer@demo.vn | Can bo Da Nang |
+| officer@demo.vn | Can bo Khanh Hoa (Nha Trang) |
 | rescuer@demo.vn | Doi cuu ho |
 | citizen@demo.vn | Nguoi dan (nha trong vung canh bao) |
 | outsider@demo.vn | Nguoi dan (Ha Noi, ngoai vung) |

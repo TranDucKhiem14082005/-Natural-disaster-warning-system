@@ -27,3 +27,8 @@ export function useCatalog(): Catalog {
   }, []);
   return catalog;
 }
+
+/** Drop the cached catalog after admins edit regions or disaster types; the next useCatalog() refetches. */
+export function invalidateCatalog() {
+  cache = null;
+}

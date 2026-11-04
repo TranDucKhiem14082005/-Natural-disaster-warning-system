@@ -57,6 +57,8 @@ class Geo
 
     public static function containsPointSql(string $areaColumn, float $lat, float $lng): string
     {
-        return sprintf("ST_Contains(%s, ST_GeomFromText('POINT(%F %F)', %d))", $areaColumn, $lng, $lat, self::SRID);
+        // "= 1" keeps the optimizer off the spatial index: MariaDB 10.4.32 fails an autocommit SELECT that probes it
+        // with a constant point (error 1207 "Update locks cannot be acquired during a READ UNCOMMITTED transaction").
+        return sprintf("ST_Contains(%s, ST_GeomFromText('POINT(%F %F)', %d)) = 1", $areaColumn, $lng, $lat, self::SRID);
     }
 }

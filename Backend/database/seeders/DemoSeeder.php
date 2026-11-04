@@ -19,29 +19,30 @@ class DemoSeeder extends Seeder
 {
     public function run(AlertService $alerts, SosService $sos): void
     {
-        $dn = Region::where('code', 'DN')->first();
-        $hue = Region::where('code', 'HUE')->first();
+        $kh = Region::where('code', 'KH')->first();
         $flood = DisasterType::where('code', 'flood')->first();
         $storm = DisasterType::where('code', 'storm')->first();
 
         $admin = $this->user('Quản trị viên', 'admin@demo.vn', '0900000001', Role::Admin);
-        $officer = $this->user('Cán bộ Đà Nẵng', 'officer@demo.vn', '0900000002', Role::Officer, $dn->id);
-        $rescuer = $this->user('Đội cứu hộ 1', 'rescuer@demo.vn', '0900000003', Role::Rescuer, $dn->id);
+        $officer = $this->user('Cán bộ Khánh Hoà', 'officer@demo.vn', '0900000002', Role::Officer, $kh->id);
+        $rescuer = $this->user('Đội cứu hộ 1', 'rescuer@demo.vn', '0900000003', Role::Rescuer, $kh->id);
         $citizen = $this->user('Nguyễn Văn Dân', 'citizen@demo.vn', '0900000004', Role::Citizen);
         $outsider = $this->user('Trần Thị Xa', 'outsider@demo.vn', '0900000005', Role::Citizen);
 
-        $rescuer->locations()->firstOrCreate(['label' => 'Trạm'], ['lat' => 16.0610, 'lng' => 108.2150]);
-        $citizen->locations()->firstOrCreate(['label' => 'Nhà'], ['lat' => 16.0471, 'lng' => 108.2068, 'address' => 'Hải Châu, Đà Nẵng']);
+        $rescuer->locations()->firstOrCreate(['label' => 'Trạm'], ['lat' => 12.2480, 'lng' => 109.1940]);
+        $citizen->locations()->firstOrCreate(['label' => 'Nhà'], ['lat' => 12.2560, 'lng' => 109.1830, 'address' => 'Ngọc Hiệp, Nha Trang']);
         $outsider->locations()->firstOrCreate(['label' => 'Nhà'], ['lat' => 21.0285, 'lng' => 105.8542, 'address' => 'Hoàn Kiếm, Hà Nội']);
 
         $shelters = [
-            ['Trường THPT Phan Châu Trinh', 16.0678, 108.2208, 500, 120, ['water', 'power', 'toilet']],
-            ['Nhà văn hoá Hoà Cường', 16.0335, 108.2210, 200, 40, ['water', 'medical']],
-            ['Cung thể thao Tiên Sơn', 16.0367, 108.2265, 1000, 1000, ['water', 'power', 'medical', 'food']],
+            ['Trường THPT Lý Tự Trọng', 12.2440, 109.1915, 500, 120, ['water', 'power', 'toilet']],
+            ['Nhà văn hoá phường Ngọc Hiệp', 12.2605, 109.1760, 200, 40, ['water', 'medical']],
+            ['Nhà thi đấu tỉnh Khánh Hoà', 12.2470, 109.1880, 1000, 1000, ['water', 'power', 'medical', 'food']],
+            // Outside the 2.5km demo flood zone, so the evacuation route has a reachable target.
+            ['Trường Đại học Khánh Hoà', 12.2205, 109.1985, 800, 150, ['water', 'power', 'medical', 'toilet']],
         ];
         foreach ($shelters as [$name, $lat, $lng, $cap, $occ, $amen]) {
             Shelter::firstOrCreate(['name' => $name], [
-                'region_id' => $dn->id, 'lat' => $lat, 'lng' => $lng, 'capacity' => $cap, 'current_occupancy' => $occ, 'amenities' => $amen,
+                'region_id' => $kh->id, 'lat' => $lat, 'lng' => $lng, 'capacity' => $cap, 'current_occupancy' => $occ, 'amenities' => $amen,
             ]);
         }
 
@@ -50,29 +51,29 @@ class DemoSeeder extends Seeder
         }
 
         $event = DisasterEvent::create([
-            'name' => 'Bão số 6 (demo)', 'disaster_type_id' => $storm->id, 'region_id' => $dn->id, 'severity' => 4,
-            'status' => DisasterEvent::STATUS_ONGOING, 'started_at' => now()->subDay(), 'lat' => 16.0, 'lng' => 108.5,
-            'description' => 'Bão đổ bộ vào khu vực miền Trung.', 'created_by' => $officer->id,
+            'name' => 'Bão số 6 (demo)', 'disaster_type_id' => $storm->id, 'region_id' => $kh->id, 'severity' => 4,
+            'status' => DisasterEvent::STATUS_ONGOING, 'started_at' => now()->subDay(), 'lat' => 12.30, 'lng' => 109.45,
+            'description' => 'Bão đổ bộ vào khu vực Nam Trung Bộ.', 'created_by' => $officer->id,
         ]);
 
         $published = $alerts->create([
-            'title' => 'Cảnh báo ngập lụt quận Hải Châu',
-            'description' => 'Mưa lớn gây ngập sâu 0,5-1m tại các tuyến đường trũng.',
+            'title' => 'Cảnh báo ngập lụt phường Ngọc Hiệp',
+            'description' => 'Nước sông Cái dâng cao gây ngập sâu 0,5-1m tại các tuyến đường trũng ven sông.',
             'instructions' => $flood->default_instructions,
-            'disaster_type_id' => $flood->id, 'disaster_event_id' => $event->id, 'region_id' => $dn->id, 'severity' => 4,
-            'area' => ['type' => 'circle', 'center' => ['lat' => 16.0471, 'lng' => 108.2068], 'radius_m' => 3000],
+            'disaster_type_id' => $flood->id, 'disaster_event_id' => $event->id, 'region_id' => $kh->id, 'severity' => 4,
+            'area' => ['type' => 'circle', 'center' => ['lat' => 12.2585, 'lng' => 109.1810], 'radius_m' => 2500],
         ], $officer);
         $alerts->publish($published, $officer);
 
         $alerts->create([
-            'title' => 'Nguy cơ sạt lở khu vực đèo Hải Vân',
-            'disaster_type_id' => DisasterType::where('code', 'landslide')->value('id'), 'region_id' => $hue->id, 'severity' => 3,
-            'area' => ['type' => 'polygon', 'coordinates' => [[108.10, 16.17], [108.18, 16.17], [108.18, 16.22], [108.10, 16.22]]],
+            'title' => 'Nguy cơ sạt lở khu vực đèo Khánh Lê',
+            'disaster_type_id' => DisasterType::where('code', 'landslide')->value('id'), 'region_id' => $kh->id, 'severity' => 3,
+            'area' => ['type' => 'polygon', 'coordinates' => [[108.70, 12.24], [108.80, 12.24], [108.80, 12.30], [108.70, 12.30]]],
         ], $officer);
 
         $report = new Report([
-            'disaster_type_id' => $flood->id, 'region_id' => $dn->id, 'lat' => 16.0500, 'lng' => 108.2100,
-            'description' => 'Đường Lê Duẩn ngập khoảng 60cm, xe máy không qua được.',
+            'disaster_type_id' => $flood->id, 'region_id' => $kh->id, 'lat' => 12.2575, 'lng' => 109.1835,
+            'description' => 'Đường 2/4 đoạn qua Ngọc Hiệp ngập khoảng 60cm, xe máy không qua được.',
         ]);
         $report->user_id = $citizen->id;
         $report->status = ReportStatus::Approved;
@@ -81,8 +82,8 @@ class DemoSeeder extends Seeder
         $report->save();
 
         $sos->create([
-            'contact_name' => 'Lê Văn Kẹt', 'contact_phone' => '0911222333', 'region_id' => $dn->id,
-            'lat' => 16.0450, 'lng' => 108.2050, 'people_count' => 4, 'conditions' => ['elderly', 'trapped'],
+            'contact_name' => 'Lê Văn Kẹt', 'contact_phone' => '0911222333', 'region_id' => $kh->id,
+            'lat' => 12.2550, 'lng' => 109.1800, 'people_count' => 4, 'conditions' => ['elderly', 'trapped'],
             'note' => 'Nước lên tới tầng 1, có người già.',
         ], null, '127.0.0.1');
     }

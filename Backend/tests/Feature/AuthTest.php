@@ -60,4 +60,16 @@ class AuthTest extends ApiTestCase
         $this->assertFalse($citizen->fresh()->is_active);
         $this->assertSame(0, $citizen->tokens()->count());
     }
+
+    public function test_activity_log_records_staff_writes_but_not_socket_handshakes(): void
+    {
+        $officer = $this->makeUser(Role::Officer, $this->danang);
+        $this->actingAs($officer);
+
+        $this->postJson('/api/broadcasting/auth', ['socket_id' => '1.1', 'channel_name' => 'private-staff.sos']);
+        $this->assertDatabaseCount('activity_logs', 0);
+
+        $this->postJson('/api/v1/manage/alerts', $this->alertPayload())->assertCreated();
+        $this->assertDatabaseHas('activity_logs', ['user_id' => $officer->id, 'method' => 'POST', 'path' => 'api/v1/manage/alerts']);
+    }
 }

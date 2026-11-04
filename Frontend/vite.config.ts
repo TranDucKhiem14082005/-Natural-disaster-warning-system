@@ -9,6 +9,8 @@ export default defineConfig(({ mode }) => {
 
   return {
     plugins: [react()],
+    // MapLibre starts its worker with { type: 'module' }.
+    worker: { format: 'es' },
     server: {
       port: 5173,
       // Same-origin calls in dev: no CORS setup needed on the Laravel side, mirrors Infra nginx.

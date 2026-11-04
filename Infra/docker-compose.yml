@@ -110,6 +110,9 @@ services:
       context: ..
       dockerfile: Infra/docker/php/Dockerfile
       target: web
+      args:
+        VITE_REVERB_APP_KEY: ${REVERB_APP_KEY:-}
+        VITE_MAP_TILE_URL: ${VITE_MAP_TILE_URL:-}
     restart: unless-stopped
     ports:
       - "${HTTP_PORT:-8000}:80"
