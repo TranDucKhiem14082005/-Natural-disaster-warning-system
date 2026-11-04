@@ -22,13 +22,7 @@ class EvacuationService
     {
         $dangerAreas = Alert::active()->get(['id', 'area_geojson', 'updated_at']);
 
-        $shelter = Shelter::available()
-            ->nearest($lat, $lng, self::SEARCH_RADIUS_KM)
-            ->whereNotExists(fn ($q) => $q->selectRaw('1')
-                ->from('alerts')
-                ->whereIn('alerts.status', ['published', 'updated'])
-                ->whereRaw('ST_Contains(alerts.area, shelters.location)'))
-            ->first();
+        $shelter = $this->nearestSafeShelter($lat, $lng);
 
         if (! $shelter) {
             return null;
@@ -42,6 +36,18 @@ class EvacuationService
             'danger_alert_ids' => $inDanger,
             'route' => $this->route($lat, $lng, $shelter, $dangerAreas),
         ];
+    }
+
+    /** Nearest shelter with room, within the search radius and outside every active alert area. */
+    public function nearestSafeShelter(float $lat, float $lng): ?Shelter
+    {
+        return Shelter::available()
+            ->nearest($lat, $lng, self::SEARCH_RADIUS_KM)
+            ->whereNotExists(fn ($q) => $q->selectRaw('1')
+                ->from('alerts')
+                ->whereIn('alerts.status', ['published', 'updated'])
+                ->whereRaw('ST_Contains(alerts.area, shelters.location) = 1'))
+            ->first();
     }
 
     private function route(float $lat, float $lng, Shelter $shelter, $dangerAreas): array

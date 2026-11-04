@@ -12,12 +12,15 @@ class LogActivity
 {
     private const SECRET_FIELDS = ['password', 'password_confirmation', 'token', 'current_password'];
 
+    // Socket handshakes fire on every page load and are not admin actions; logging them buries the real audit trail.
+    private const SKIP_PATHS = ['api/broadcasting/auth'];
+
     public function handle(Request $request, Closure $next): Response
     {
         $response = $next($request);
 
         $user = $request->user();
-        if ($user && $user->isStaff() && ! $request->isMethodSafe()) {
+        if ($user && $user->isStaff() && ! $request->isMethodSafe() && ! $request->is(...self::SKIP_PATHS)) {
             ActivityLog::create([
                 'user_id' => $user->id,
                 'method' => $request->method(),
