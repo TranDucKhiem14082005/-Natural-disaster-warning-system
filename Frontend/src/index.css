@@ -10,13 +10,27 @@ body {
   @apply bg-slate-50 text-slate-900 antialiased;
 }
 
+:focus-visible {
+  @apply outline-none ring-2 ring-brand-500 ring-offset-2;
+}
+
+/* Bottom tab bar must clear the iOS home indicator. */
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
 /* Keep Leaflet popups/links readable with Tailwind's preflight reset. */
+.leaflet-popup-content {
+  @apply font-sans text-sm;
+}
+
 .leaflet-popup-content a {
   @apply font-medium text-brand-600 underline;
 }
 
 .leaflet-container {
   z-index: 0;
+  font-family: inherit;
 }
 
 @media (prefers-reduced-motion: reduce) {
