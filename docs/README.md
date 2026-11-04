@@ -11,3 +11,4 @@
 ## Index
 
 - [Backend API v1](02-ky-thuat/backend-api.md) - endpoint, vong doi canh bao / SOS, kenh realtime, tac vu nen
+- [Huong dan su dung va trien khai](04-van-hanh/huong-dan-su-dung-va-trien-khai.md) - toan bo chuc nang theo vai tro; chay local, Docker, VPS
