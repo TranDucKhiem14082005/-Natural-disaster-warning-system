@@ -1,0 +1,142 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 770" width="1200" height="770" font-family="Segoe UI, Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0L10 5L0 10z" fill="#475569"/>
+    </marker>
+    <style>
+      .t{font-size:15px;font-weight:600;fill:#0f172a}
+      .s{font-size:12px;fill:#475569}
+      .m{font-size:11.5px;fill:#64748b;font-family:Consolas, Menlo, monospace}
+      .lbl{font-size:11.5px;fill:#334155;font-weight:600}
+      .line{stroke:#475569;stroke-width:1.6;fill:none}
+      .dash{stroke:#94a3b8;stroke-width:1.6;fill:none;stroke-dasharray:6 5}
+    </style>
+  </defs>
+  <rect width="1200" height="770" fill="#ffffff"/>
+
+  <text x="40" y="42" font-size="22" font-weight="700" fill="#0f172a">Kiến trúc hệ thống cảnh báo thiên tai</text>
+  <text x="40" y="64" class="s">Triển khai bằng Docker Compose (Infra/). Chỉ cổng :8000 mở ra ngoài; mọi service nội bộ đi qua nginx.</text>
+
+  <!-- Browser -->
+  <rect x="40" y="190" width="240" height="330" rx="14" fill="#eff6ff" stroke="#93c5fd" stroke-width="1.5"/>
+  <text x="60" y="220" class="t">Trình duyệt</text>
+  <text x="60" y="239" class="s">React 18 SPA · TypeScript · Vite</text>
+  <text x="60" y="255" class="s">Leaflet · Laravel Echo</text>
+  <g>
+    <rect x="58" y="275" width="204" height="48" rx="9" fill="#fff" stroke="#bfdbfe"/>
+    <text x="72" y="296" class="lbl">Công khai + Người dân</text>
+    <text x="72" y="313" class="m">/  /me</text>
+    <rect x="58" y="331" width="204" height="48" rx="9" fill="#fff" stroke="#bfdbfe"/>
+    <text x="72" y="352" class="lbl">Đội cứu hộ</text>
+    <text x="72" y="369" class="m">/rescuer</text>
+    <rect x="58" y="387" width="204" height="48" rx="9" fill="#fff" stroke="#bfdbfe"/>
+    <text x="72" y="408" class="lbl">Cán bộ quản lý</text>
+    <text x="72" y="425" class="m">/officer</text>
+    <rect x="58" y="443" width="204" height="48" rx="9" fill="#fff" stroke="#bfdbfe"/>
+    <text x="72" y="464" class="lbl">Quản trị viên</text>
+    <text x="72" y="481" class="m">/admin</text>
+  </g>
+
+  <!-- Docker boundary -->
+  <rect x="330" y="100" width="540" height="640" rx="16" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="8 6"/>
+  <text x="350" y="125" class="lbl" fill="#64748b">DOCKER COMPOSE</text>
+
+  <!-- nginx -->
+  <rect x="360" y="140" width="480" height="72" rx="12" fill="#ffffff" stroke="#64748b" stroke-width="1.5"/>
+  <text x="380" y="168" class="t">nginx 1.27 · cổng :8000</text>
+  <text x="380" y="190" class="m">SPA tĩnh   /api/v1   /storage   /app (WebSocket)</text>
+
+  <!-- app -->
+  <rect x="360" y="262" width="230" height="96" rx="12" fill="#eef2ff" stroke="#818cf8" stroke-width="1.5"/>
+  <text x="378" y="290" class="t">app · Laravel 12 API</text>
+  <text x="378" y="310" class="s">PHP 8.2-FPM · Sanctum token</text>
+  <text x="378" y="327" class="s">Phân quyền theo vai trò, địa bàn</text>
+  <text x="378" y="344" class="s">Geofencing ST_Contains</text>
+
+  <!-- reverb -->
+  <rect x="610" y="262" width="230" height="96" rx="12" fill="#faf5ff" stroke="#c084fc" stroke-width="1.5"/>
+  <text x="628" y="290" class="t">reverb · WebSocket</text>
+  <text x="628" y="310" class="s">Laravel Reverb (nội bộ :8080)</text>
+  <text x="628" y="327" class="m">alerts  sos.{code}</text>
+  <text x="628" y="344" class="m">staff.sos  App.Models.User.{id}</text>
+
+  <!-- db -->
+  <rect x="360" y="412" width="230" height="96" rx="12" fill="#ecfdf5" stroke="#34d399" stroke-width="1.5"/>
+  <text x="378" y="440" class="t">db · MariaDB 10.4.32</text>
+  <text x="378" y="460" class="s">GIS SRID 4326, POINT(lng lat)</text>
+  <text x="378" y="477" class="s">Spatial index · bảng jobs</text>
+  <text x="378" y="494" class="s">Volume db-data</text>
+
+  <!-- queue -->
+  <rect x="610" y="412" width="230" height="96" rx="12" fill="#fffbeb" stroke="#fbbf24" stroke-width="1.5"/>
+  <text x="628" y="440" class="t">queue · queue:work</text>
+  <text x="628" y="460" class="s">Database Queue</text>
+  <text x="628" y="477" class="s">Gửi thông báo, email (mức 4-5)</text>
+  <text x="628" y="494" class="s">Broadcast sự kiện realtime</text>
+
+  <!-- storage -->
+  <rect x="360" y="562" width="230" height="64" rx="12" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+  <text x="378" y="588" class="t" font-size="14">volume storage</text>
+  <text x="378" y="608" class="s">Ảnh/video báo cáo (app ghi, nginx đọc)</text>
+
+  <!-- scheduler -->
+  <rect x="610" y="562" width="230" height="80" rx="12" fill="#fffbeb" stroke="#fbbf24" stroke-width="1.5"/>
+  <text x="628" y="590" class="t">scheduler · schedule:work</text>
+  <text x="628" y="610" class="m">weather:fetch      mỗi giờ</text>
+  <text x="628" y="627" class="m">earthquakes:fetch  30 phút</text>
+
+  <!-- small services -->
+  <rect x="360" y="660" width="230" height="56" rx="10" fill="#ffffff" stroke="#e2e8f0"/>
+  <text x="378" y="684" class="lbl">phpMyAdmin 5.2</text>
+  <text x="378" y="702" class="m">127.0.0.1:8081</text>
+  <rect x="610" y="660" width="230" height="56" rx="10" fill="#ffffff" stroke="#e2e8f0"/>
+  <text x="628" y="684" class="lbl">migrate (chạy một lần)</text>
+  <text x="628" y="702" class="m">php artisan migrate --force</text>
+
+  <!-- external: browser-side -->
+  <rect x="920" y="150" width="240" height="250" rx="14" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1.5"/>
+  <text x="938" y="176" class="lbl" fill="#64748b">TRÌNH DUYỆT GỌI TRỰC TIẾP</text>
+  <rect x="938" y="190" width="204" height="56" rx="9" fill="#fff" stroke="#e2e8f0"/>
+  <text x="952" y="212" class="lbl">OpenFreeMap</text>
+  <text x="952" y="231" class="s">Bản đồ nền vector, nhãn tiếng Việt</text>
+  <rect x="938" y="256" width="204" height="56" rx="9" fill="#fff" stroke="#e2e8f0"/>
+  <text x="952" y="278" class="lbl">OSRM (FOSSGIS)</text>
+  <text x="952" y="297" class="s">Tuyến đi bộ, xe máy, ô tô</text>
+  <rect x="938" y="322" width="204" height="56" rx="9" fill="#fff" stroke="#e2e8f0"/>
+  <text x="952" y="344" class="lbl">Photon</text>
+  <text x="952" y="363" class="s">Tìm địa chỉ, địa chỉ gần nhất</text>
+
+  <!-- external: server-side -->
+  <rect x="920" y="520" width="240" height="180" rx="14" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1.5"/>
+  <text x="938" y="546" class="lbl" fill="#64748b">DỮ LIỆU MỞ (MÁY CHỦ GỌI)</text>
+  <rect x="938" y="560" width="204" height="56" rx="9" fill="#fff" stroke="#e2e8f0"/>
+  <text x="952" y="582" class="lbl">Open-Meteo</text>
+  <text x="952" y="601" class="s">Mưa, gió 3 ngày theo khu vực</text>
+  <rect x="938" y="626" width="204" height="56" rx="9" fill="#fff" stroke="#e2e8f0"/>
+  <text x="952" y="648" class="lbl">USGS</text>
+  <text x="952" y="667" class="s">Động đất M ≥ 3.5 quanh Việt Nam</text>
+
+  <!-- arrows -->
+  <path class="line" d="M280 240 H318 V176 H356" marker-end="url(#arr)"/>
+  <text x="250" y="160" class="lbl">HTTPS · REST + WS</text>
+
+  <path class="dash" d="M160 190 V90 H1040 V146" marker-end="url(#arr)"/>
+  <text x="560" y="83" class="lbl" fill="#64748b">Tile bản đồ, chỉ đường, tìm địa chỉ</text>
+
+  <path class="line" d="M475 212 V258" marker-end="url(#arr)"/>
+  <text x="483" y="240" class="m">FastCGI</text>
+  <path class="line" d="M725 212 V258" marker-end="url(#arr)"/>
+  <text x="733" y="240" class="m">/app</text>
+
+  <path class="line" d="M475 358 V408" marker-end="url(#arr)"/>
+  <text x="483" y="388" class="m">SQL</text>
+  <path class="line" d="M610 460 H594" marker-end="url(#arr)"/>
+  <path class="line" d="M725 412 V362" marker-end="url(#arr)"/>
+  <text x="733" y="392" class="m">broadcast</text>
+  <path class="line" d="M590 310 H602 V400 H640 V408" marker-end="url(#arr)"/>
+  <text x="612" y="392" class="m">job</text>
+
+  <path class="line" d="M610 600 H600 V500 H594" marker-end="url(#arr)"/>
+  <path class="line" d="M840 602 H916" marker-end="url(#arr)"/>
+  <text x="852" y="594" class="m">HTTP</text>
+</svg>

@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 540" width="1200" height="540" font-family="Segoe UI, Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0L10 5L0 10z" fill="#475569"/>
+    </marker>
+    <style>
+      .t{font-size:15px;font-weight:600;fill:#0f172a}
+      .s{font-size:12px;fill:#475569}
+      .m{font-size:11.5px;fill:#64748b;font-family:Consolas, Menlo, monospace}
+      .lbl{font-size:12px;fill:#334155;font-weight:600}
+      .who{font-size:11px;font-weight:700;letter-spacing:.6px}
+      .line{stroke:#475569;stroke-width:1.6;fill:none}
+      .tick{stroke:#cbd5e1;stroke-width:1.5;stroke-dasharray:4 4}
+    </style>
+  </defs>
+  <rect width="1200" height="540" fill="#ffffff"/>
+
+  <text x="40" y="40" font-size="22" font-weight="700" fill="#0f172a">Luồng xử lý yêu cầu SOS</text>
+  <text x="40" y="62" class="s">Trạng thái chỉ đi tiến từng bước. Người gửi theo dõi tiến trình realtime bằng mã theo dõi.</text>
+
+  <!-- states -->
+  <rect x="40" y="90" width="250" height="64" rx="32" fill="#fef2f2" stroke="#ef4444" stroke-width="1.5"/>
+  <text x="165" y="118" class="t" text-anchor="middle">Mới</text>
+  <text x="165" y="138" class="m" text-anchor="middle">new</text>
+  <rect x="330" y="90" width="250" height="64" rx="32" fill="#fff7ed" stroke="#f97316" stroke-width="1.5"/>
+  <text x="455" y="118" class="t" text-anchor="middle">Đã tiếp nhận</text>
+  <text x="455" y="138" class="m" text-anchor="middle">received</text>
+  <rect x="620" y="90" width="250" height="64" rx="32" fill="#eff6ff" stroke="#3b82f6" stroke-width="1.5"/>
+  <text x="745" y="118" class="t" text-anchor="middle">Đang cứu hộ</text>
+  <text x="745" y="138" class="m" text-anchor="middle">rescuing</text>
+  <rect x="910" y="90" width="250" height="64" rx="32" fill="#ecfdf5" stroke="#10b981" stroke-width="1.5"/>
+  <text x="1035" y="118" class="t" text-anchor="middle">Đã an toàn</text>
+  <text x="1035" y="138" class="m" text-anchor="middle">safe</text>
+
+  <path class="line" d="M290 122 H326" marker-end="url(#arr)"/>
+  <path class="line" d="M580 122 H616" marker-end="url(#arr)"/>
+  <path class="line" d="M870 122 H906" marker-end="url(#arr)"/>
+
+  <line class="tick" x1="165" y1="154" x2="165" y2="186"/>
+  <line class="tick" x1="455" y1="154" x2="455" y2="186"/>
+  <line class="tick" x1="745" y1="154" x2="745" y2="186"/>
+  <line class="tick" x1="1035" y1="154" x2="1035" y2="186"/>
+
+  <!-- action cards -->
+  <rect x="40" y="186" width="250" height="150" rx="12" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+  <text x="58" y="212" class="who" fill="#dc2626">NGƯỜI DÂN / KHÁCH</text>
+  <text x="58" y="236" class="t">Gửi SOS một chạm</text>
+  <text x="58" y="258" class="s">Tự lấy vị trí GPS, nhập số người</text>
+  <text x="58" y="276" class="s">Tình trạng: bị thương, mắc kẹt,</text>
+  <text x="58" y="294" class="s">trẻ em, người già, mang thai...</text>
+  <text x="58" y="318" class="s">Hệ thống tự tính <tspan class="lbl">ưu tiên 1-5</tspan></text>
+
+  <rect x="330" y="186" width="250" height="150" rx="12" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+  <text x="348" y="212" class="who" fill="#ea580c">CÁN BỘ ĐIỀU PHỐI</text>
+  <text x="348" y="236" class="t">Xác minh và phân công</text>
+  <text x="348" y="258" class="s">Hàng đợi xếp theo ưu tiên</text>
+  <text x="348" y="276" class="s">Gợi ý đội gần nhất, ít việc nhất</text>
+  <text x="348" y="294" class="s">Phân công đội: tự chuyển</text>
+  <text x="348" y="312" class="s">sang Đã tiếp nhận</text>
+
+  <rect x="620" y="186" width="250" height="150" rx="12" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+  <text x="638" y="212" class="who" fill="#2563eb">ĐỘI CỨU HỘ</text>
+  <text x="638" y="236" class="t">Nhận nhiệm vụ, xuất phát</text>
+  <text x="638" y="258" class="s">Nhiệm vụ hiện ngay trên điện thoại</text>
+  <text x="638" y="276" class="s">Chỉ đường tới vị trí người gửi</text>
+  <text x="638" y="294" class="s">Bấm bắt đầu cứu hộ</text>
+
+  <rect x="910" y="186" width="250" height="150" rx="12" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+  <text x="928" y="212" class="who" fill="#059669">ĐỘI CỨU HỘ / CÁN BỘ</text>
+  <text x="928" y="236" class="t">Xác nhận an toàn</text>
+  <text x="928" y="258" class="s">Đóng yêu cầu</text>
+  <text x="928" y="276" class="s">Ghi nhận thời gian phản hồi</text>
+  <text x="928" y="294" class="s">và hoàn tất vào thống kê</text>
+
+  <!-- info -->
+  <rect x="40" y="370" width="545" height="140" rx="12" fill="#faf5ff" stroke="#c084fc" stroke-width="1.5"/>
+  <text x="60" y="398" class="t">Realtime qua Laravel Reverb</text>
+  <text x="60" y="424" class="m">sos.{tracking_code}</text>
+  <text x="240" y="424" class="s">Công khai: người gửi theo dõi tại /sos/track/:code,</text>
+  <text x="240" y="442" class="s">chỉ có trạng thái, không có tọa độ</text>
+  <text x="60" y="470" class="m">staff.sos</text>
+  <text x="240" y="470" class="s">Riêng tư: cán bộ và đội cứu hộ, hiện SOS mới</text>
+  <text x="240" y="488" class="s">trên bản đồ điều phối ngay lập tức</text>
+
+  <rect x="615" y="370" width="545" height="140" rx="12" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+  <text x="635" y="398" class="t">Xác minh, chống spam và bảo mật vị trí</text>
+  <text x="635" y="424" class="s">• Không cần đăng nhập; giới hạn 3 lần gửi / 10 phút</text>
+  <text x="635" y="448" class="s">• Cùng số điện thoại gửi lại trong 30 phút khi chưa an toàn:</text>
+  <text x="647" y="466" class="s">trả về yêu cầu cũ, không tạo trùng</text>
+  <text x="635" y="490" class="s">• Tọa độ SOS chỉ cán bộ và đội cứu hộ được xem (kiểm tra ở backend)</text>
+</svg>

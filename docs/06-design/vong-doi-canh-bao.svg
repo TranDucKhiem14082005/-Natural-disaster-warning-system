@@ -1,0 +1,106 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 620" width="1200" height="620" font-family="Segoe UI, Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0L10 5L0 10z" fill="#475569"/>
+    </marker>
+    <style>
+      .t{font-size:15px;font-weight:600;fill:#0f172a}
+      .s{font-size:12px;fill:#475569}
+      .m{font-size:11.5px;fill:#64748b;font-family:Consolas, Menlo, monospace}
+      .lbl{font-size:12px;fill:#334155;font-weight:600}
+      .line{stroke:#475569;stroke-width:1.6;fill:none}
+      .dash{stroke:#94a3b8;stroke-width:1.6;fill:none;stroke-dasharray:6 5}
+    </style>
+  </defs>
+  <rect width="1200" height="620" fill="#ffffff"/>
+
+  <text x="40" y="40" font-size="22" font-weight="700" fill="#0f172a">Vòng đời cảnh báo và geofencing</text>
+  <text x="40" y="62" class="s">Mỗi lần đổi trạng thái hoặc sửa nội dung đều lưu một phiên bản (alert_versions).</text>
+
+  <!-- auto source -->
+  <rect x="470" y="80" width="300" height="46" rx="10" fill="#fffbeb" stroke="#fbbf24"/>
+  <text x="486" y="100" class="lbl">weather:fetch (mỗi giờ, Open-Meteo)</text>
+  <text x="486" y="117" class="s">Mưa vượt ngưỡng: tự tạo cảnh báo lũ chờ duyệt</text>
+  <path class="dash" d="M520 126 V150 H400 V176" marker-end="url(#arr)"/>
+
+  <!-- states -->
+  <g>
+    <rect x="40" y="180" width="190" height="70" rx="35" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5"/>
+    <text x="135" y="210" class="t" text-anchor="middle">Nháp</text>
+    <text x="135" y="230" class="m" text-anchor="middle">draft</text>
+
+    <rect x="290" y="180" width="190" height="70" rx="35" fill="#fefce8" stroke="#eab308" stroke-width="1.5"/>
+    <text x="385" y="210" class="t" text-anchor="middle">Chờ duyệt</text>
+    <text x="385" y="230" class="m" text-anchor="middle">pending</text>
+
+    <rect x="540" y="180" width="190" height="70" rx="35" fill="#fef2f2" stroke="#ef4444" stroke-width="1.5"/>
+    <text x="635" y="210" class="t" text-anchor="middle">Phát hành</text>
+    <text x="635" y="230" class="m" text-anchor="middle">published</text>
+
+    <rect x="790" y="180" width="190" height="70" rx="35" fill="#fff7ed" stroke="#f97316" stroke-width="1.5"/>
+    <text x="885" y="210" class="t" text-anchor="middle">Cập nhật</text>
+    <text x="885" y="230" class="m" text-anchor="middle">updated</text>
+
+    <rect x="1010" y="180" width="150" height="70" rx="35" fill="#f8fafc" stroke="#64748b" stroke-width="1.5" stroke-dasharray="4 3"/>
+    <text x="1085" y="210" class="t" text-anchor="middle">Kết thúc</text>
+    <text x="1085" y="230" class="m" text-anchor="middle">ended</text>
+  </g>
+
+  <path class="line" d="M230 215 H286" marker-end="url(#arr)"/>
+  <text x="258" y="206" class="m" text-anchor="middle">submit</text>
+  <path class="line" d="M480 215 H536" marker-end="url(#arr)"/>
+  <text x="508" y="206" class="m" text-anchor="middle">publish</text>
+  <path class="line" d="M730 215 H786" marker-end="url(#arr)"/>
+  <text x="758" y="206" class="m" text-anchor="middle">sửa</text>
+  <path class="line" d="M980 215 H1006" marker-end="url(#arr)"/>
+
+  <!-- reject -->
+  <path class="line" d="M330 180 C 300 140, 200 140, 160 176" marker-end="url(#arr)"/>
+  <text x="245" y="140" class="m" text-anchor="middle">reject</text>
+  <!-- updated loop -->
+  <path class="line" d="M860 180 C 845 140, 925 140, 910 176" marker-end="url(#arr)"/>
+  <text x="885" y="136" class="m" text-anchor="middle">sửa tiếp</text>
+  <!-- direct publish -->
+  <path class="line" d="M135 250 C 135 300, 600 300, 610 254" marker-end="url(#arr)"/>
+  <text x="372" y="310" class="m" text-anchor="middle">publish thẳng từ nháp</text>
+  <!-- end from published -->
+  <path class="line" d="M660 250 C 680 300, 1070 300, 1080 254" marker-end="url(#arr)"/>
+  <text x="870" y="310" class="m" text-anchor="middle">end</text>
+
+  <!-- divider -->
+  <line x1="40" y1="330" x2="1160" y2="330" stroke="#e2e8f0" stroke-width="1.5"/>
+  <text x="40" y="360" class="lbl" fill="#64748b">KHI PHÁT HÀNH HOẶC SỬA CẢNH BÁO ĐANG HIỆU LỰC</text>
+
+  <rect x="40" y="425" width="220" height="100" rx="12" fill="#eef2ff" stroke="#818cf8" stroke-width="1.5"/>
+  <text x="58" y="455" class="t">Cán bộ / admin</text>
+  <text x="58" y="476" class="s">Vẽ vùng ảnh hưởng:</text>
+  <text x="58" y="493" class="s">đa giác hoặc tâm + bán kính</text>
+  <text x="58" y="510" class="s">(xấp xỉ đa giác 32 đỉnh)</text>
+
+  <rect x="330" y="380" width="340" height="70" rx="12" fill="#faf5ff" stroke="#c084fc" stroke-width="1.5"/>
+  <text x="348" y="408" class="t">Broadcast alert.changed</text>
+  <text x="348" y="430" class="s">Kênh công khai alerts qua Laravel Reverb</text>
+
+  <rect x="740" y="380" width="420" height="70" rx="12" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+  <text x="758" y="408" class="t">Bản đồ và danh sách cảnh báo</text>
+  <text x="758" y="430" class="s">Mọi người đang mở ứng dụng thấy thay đổi ngay</text>
+
+  <rect x="330" y="490" width="340" height="96" rx="12" fill="#fffbeb" stroke="#fbbf24" stroke-width="1.5"/>
+  <text x="348" y="518" class="t">Queue job: geofencing</text>
+  <text x="348" y="540" class="m">ST_Contains(vùng, vị trí) = 1</text>
+  <text x="348" y="562" class="s">Đối chiếu với vị trí quan tâm đã lưu</text>
+  <text x="348" y="578" class="s">(nhà, nơi làm việc, nhà người thân)</text>
+
+  <rect x="740" y="480" width="420" height="66" rx="12" fill="#ecfdf5" stroke="#34d399" stroke-width="1.5"/>
+  <text x="758" y="506" class="t">Trong vùng: nhận thông báo</text>
+  <text x="758" y="528" class="s">Realtime (App.Models.User.{id}) + lưu DB; email khi mức 4-5</text>
+
+  <rect x="740" y="556" width="420" height="44" rx="12" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5"/>
+  <text x="758" y="583" class="s"><tspan class="lbl">Ngoài vùng:</tspan> không nhận thông báo</text>
+
+  <path class="line" d="M260 455 H295 V415 H326" marker-end="url(#arr)"/>
+  <path class="line" d="M260 495 H295 V538 H326" marker-end="url(#arr)"/>
+  <path class="line" d="M670 415 H736" marker-end="url(#arr)"/>
+  <path class="line" d="M670 520 H705 V513 H736" marker-end="url(#arr)"/>
+  <path class="dash" d="M670 560 H705 V578 H736" marker-end="url(#arr)"/>
+</svg>
