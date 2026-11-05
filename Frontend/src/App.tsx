@@ -23,6 +23,7 @@ const EventsPage = named(() => import('./features/events/event-pages'), 'EventsP
 const EventDetailPage = named(() => import('./features/events/event-pages'), 'EventDetailPage');
 const SheltersPage = named(() => import('./features/shelters/shelter-pages'), 'SheltersPage');
 const EvacuationPage = named(() => import('./features/shelters/shelter-pages'), 'EvacuationPage');
+const DirectionsPage = named(() => import('./features/directions/directions-page'), 'DirectionsPage');
 const ReportsPage = named(() => import('./features/reports/report-pages'), 'ReportsPage');
 const ReportDetailPage = named(() => import('./features/reports/report-pages'), 'ReportDetailPage');
 const NewReportPage = named(() => import('./features/reports/report-pages'), 'NewReportPage');
@@ -90,6 +91,7 @@ export function App() {
           <Route path="events/:id" element={<EventDetailPage />} />
           <Route path="shelters" element={<SheltersPage />} />
           <Route path="evacuation" element={<EvacuationPage />} />
+          <Route path="directions" element={<DirectionsPage />} />
           <Route path="reports" element={<ReportsPage />} />
           <Route path="reports/new" element={<RequireRole><NewReportPage /></RequireRole>} />
           <Route path="reports/:id" element={<ReportDetailPage />} />
@@ -118,6 +120,7 @@ export function App() {
           <Route path="sos/:id" element={<RescuerTaskPage />} />
           <Route path="map" element={<RescuerMapPage />} />
           <Route path="history" element={<RescuerHistoryPage />} />
+          <Route path="directions" element={<DirectionsPage />} />
           <Route path="notifications" element={<NotificationsPage />} />
           <Route path="profile" element={<ProfilePage />} />
         </Route>
@@ -133,6 +136,7 @@ export function App() {
           <Route path="events" element={<EventsManagePage />} />
           <Route path="shelters" element={<SheltersManagePage />} />
           <Route path="stats" element={<StatsPage />} />
+          <Route path="directions" element={<DirectionsPage />} />
           <Route path="notifications" element={<NotificationsPage />} />
           <Route path="profile" element={<ProfilePage />} />
         </Route>

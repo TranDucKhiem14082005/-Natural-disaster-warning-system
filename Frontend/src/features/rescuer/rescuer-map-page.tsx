@@ -87,9 +87,9 @@ export function RescuerMapPage() {
               <AnchorButton href={`tel:${selected.contact_phone}`} variant="secondary" size="lg" icon={Phone}>
                 Gọi
               </AnchorButton>
-              <AnchorButton href={directionsUrl(selected, me)} target="_blank" rel="noreferrer" variant="secondary" size="lg" icon={Navigation}>
+              <LinkButton to={directionsUrl(selected, me)} variant="secondary" size="lg" icon={Navigation}>
                 Chỉ đường
-              </AnchorButton>
+              </LinkButton>
             </div>
             <LinkButton to={`/rescuer/sos/${selected.id}`} size="lg" block iconRight={ChevronRight} className="mt-2">
               Mở nhiệm vụ

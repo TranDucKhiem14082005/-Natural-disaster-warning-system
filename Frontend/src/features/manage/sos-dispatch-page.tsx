@@ -1,11 +1,13 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Marker, Popup } from 'react-leaflet';
-import { BadgeCheck, CircleCheck, Clock, ExternalLink, MapPin, Phone, RefreshCw, Search, ShieldCheck, Siren, UserRoundCheck, Users, Wifi, WifiOff } from 'lucide-react';
+import { BadgeCheck, CircleCheck, Clock, Phone, RefreshCw, Search, ShieldCheck, Siren, UserRoundCheck, Users, Wifi, WifiOff } from 'lucide-react';
 import { api, errorText } from '../../services/api';
 import { getEcho } from '../../services/echo';
 import { useFetch } from '../../hooks/use-fetch';
 import type { Paginated, RescuerSuggestion, SosRequest, SosStatus } from '../../types/api';
-import { BaseMap, FitBounds, pinIcon } from '../../components/map/base-map';
+import { BaseMap, FitBounds, FlyTo, pinIcon } from '../../components/map/base-map';
+import { SignalAddress, SignalLocation, signalIcon } from '../../components/map/signal-location';
 import {
   AnchorButton,
   Badge,
@@ -26,7 +28,7 @@ import {
   useToast,
 } from '../../components/ui';
 import { SOS_NEXT, SOS_STATUS_LABELS, fmtDateTime, fmtDistance } from '../../utils/format';
-import { ConditionChips, SOS_PIN_COLORS, osmLink, timeAgo } from './manage-ui';
+import { ConditionChips, SOS_PIN_COLORS, timeAgo } from './manage-ui';
 
 type Tab = 'open' | SosStatus | 'all';
 const POLL_MS = 30_000;
@@ -35,7 +37,13 @@ export function SosDispatchPage() {
   const [tab, setTab] = useState<Tab>('open');
   const [minPriority, setMinPriority] = useState('');
   const [q, setQ] = useState('');
-  const [selectedId, setSelectedId] = useState<number | null>(null);
+  const [params, setParams] = useSearchParams();
+  // ?sos=<id> from the dashboard / map popups opens that request straight away.
+  const [selectedId, setSelectedIdState] = useState<number | null>(() => Number(params.get('sos')) || null);
+  const setSelectedId = (id: number | null) => {
+    setSelectedIdState(id);
+    setParams(id ? { sos: String(id) } : {}, { replace: true });
+  };
   const [live, setLive] = useState(false);
   // One request for everything; tabs, counts and the map are derived client-side.
   const { data, error, loading, reload } = useFetch(() => api.get<Paginated<SosRequest>>('/sos', { per_page: 200 }), []);
@@ -73,6 +81,7 @@ export function SosDispatchPage() {
     return true;
   });
   const selected = all.find((s) => s.id === selectedId) ?? null;
+  const selectedPos = useMemo<[number, number] | null>(() => (selected ? [selected.lat, selected.lng] : null), [selected?.lat, selected?.lng]);
   // Refit only when the visible set changes, not on every poll/selection.
   const boundsKey = list.map((s) => s.id).join(',');
   const bounds = useMemo(
@@ -152,13 +161,25 @@ export function SosDispatchPage() {
         <div className="lg:col-span-3">
           <Card flush className="lg:sticky lg:top-20">
             <BaseMap className="h-80 rounded-none border-0 lg:h-[calc(100vh-12rem)]">
-              <FitBounds bounds={bounds} />
-              {list.map((s) => (
-                <Marker key={s.id} position={[s.lat, s.lng]} icon={pinIcon(SOS_PIN_COLORS[s.status] ?? '#64748b', String(s.priority))} eventHandlers={{ click: () => setSelectedId(s.id) }}>
+              {selectedPos ? <FlyTo position={selectedPos} zoom={16} /> : <FitBounds bounds={bounds} />}
+              {/* The selected request stays on the map even when the filters hide it from the list. */}
+              {[...list.filter((s) => s.id !== selectedId), ...(selected ? [selected] : [])].map((s) => (
+                <Marker
+                  key={s.id}
+                  position={[s.lat, s.lng]}
+                  icon={s.id === selectedId ? signalIcon(SOS_PIN_COLORS[s.status] ?? '#dc2626', String(s.priority)) : pinIcon(SOS_PIN_COLORS[s.status] ?? '#64748b', String(s.priority))}
+                  zIndexOffset={s.id === selectedId ? 1000 : 0}
+                  eventHandlers={{ click: () => setSelectedId(s.id) }}
+                >
                   <Popup>
                     <strong>SOS #{s.id}</strong> · {SOS_STATUS_LABELS[s.status]}
                     <br />
                     {s.people_count} người · ưu tiên {s.priority}
+                    <br />
+                    <span className="tabular-nums">
+                      {s.lat.toFixed(5)}, {s.lng.toFixed(5)}
+                    </span>
+                    <SignalAddress lat={s.lat} lng={s.lng} />
                   </Popup>
                 </Marker>
               ))}
@@ -267,6 +288,11 @@ function SosDetail({ sos, onChanged }: { sos: SosRequest; onChanged: () => void 
 
       {error && <Callout tone="danger">{error}</Callout>}
 
+      <section>
+        <h3 className="mb-2 text-sm font-semibold text-slate-900">Vị trí phát tín hiệu</h3>
+        <SignalLocation lat={sos.lat} lng={sos.lng} color={SOS_PIN_COLORS[sos.status] ?? '#dc2626'} label={String(sos.priority)} name={`SOS #${sos.id}`} base="/officer" />
+      </section>
+
       <div className="flex flex-wrap gap-2">
         {next && (
           <Button size="lg" icon={Siren} loading={busy === 'next'} disabled={!!busy} onClick={() => run('next', () => api.patch(`/sos/${sos.id}/status`, { status: next }), `Đã chuyển sang "${SOS_STATUS_LABELS[next]}".`)}>
@@ -300,9 +326,6 @@ function SosDetail({ sos, onChanged }: { sos: SosRequest; onChanged: () => void 
           <div className="mt-3 flex flex-wrap gap-2">
             <AnchorButton href={`tel:${sos.contact_phone}`} variant="success" size="sm" icon={Phone}>
               Gọi {sos.contact_phone}
-            </AnchorButton>
-            <AnchorButton href={osmLink(sos.lat, sos.lng)} target="_blank" rel="noreferrer" variant="secondary" size="sm" icon={MapPin} iconRight={ExternalLink}>
-              {sos.lat.toFixed(5)}, {sos.lng.toFixed(5)}
             </AnchorButton>
           </div>
         </div>

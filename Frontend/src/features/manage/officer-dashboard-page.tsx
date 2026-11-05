@@ -7,6 +7,7 @@ import {
   CircleCheck,
   ClipboardCheck,
   LifeBuoy,
+  MapPin,
   Megaphone,
   Plus,
   RefreshCw,
@@ -121,7 +122,7 @@ export function OfficerDashboardPage() {
                     <Popup>
                       <strong>SOS #{f.properties.id}</strong> · {f.properties.people_count} người
                       <br />
-                      <Link to="/officer/sos">Mở điều phối</Link>
+                      <Link to={`/officer/sos?sos=${f.properties.id}`}>Xem vị trí, điều phối</Link>
                     </Popup>
                   </Marker>
                 ) : null,
@@ -249,7 +250,9 @@ function SosQueue({ list, loading, error, onChanged }: { list: SosRequest[] | nu
               <div className="flex min-w-0 flex-1 flex-wrap items-center gap-x-4 gap-y-2 p-3">
                 <div className="min-w-0 flex-1">
                   <p className="flex flex-wrap items-center gap-1.5">
-                    <span className="font-bold text-slate-900">#{s.id}</span>
+                    <Link to={`/officer/sos?sos=${s.id}`} className="font-bold text-slate-900 hover:text-brand-700 hover:underline" title="Xem vị trí phát tín hiệu">
+                      #{s.id}
+                    </Link>
                     <SosStatusBadge status={s.status} />
                     <span className="text-xs text-slate-500">
                       ưu tiên {s.priority} · {timeAgo(s.created_at)}
@@ -258,6 +261,10 @@ function SosQueue({ list, loading, error, onChanged }: { list: SosRequest[] | nu
                   <p className="mt-1 flex items-center gap-1.5 text-sm text-slate-700">
                     <Users className="h-4 w-4 text-slate-400" aria-hidden />
                     {s.people_count} người
+                    <Link to={`/officer/sos?sos=${s.id}`} className="ml-1 inline-flex items-center gap-1 text-xs font-semibold text-brand-700 hover:underline">
+                      <MapPin className="h-3.5 w-3.5" aria-hidden />
+                      Xem vị trí
+                    </Link>
                   </p>
                   <div className="mt-1">
                     <ConditionChips conditions={s.conditions} />

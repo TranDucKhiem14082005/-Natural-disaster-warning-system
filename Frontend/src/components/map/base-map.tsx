@@ -2,6 +2,14 @@ import { useEffect, type ReactNode } from 'react';
 import { MapContainer, TileLayer, useMap, useMapEvents } from 'react-leaflet';
 import L, { type LatLngBoundsExpression, type LatLngExpression, type LeafletMouseEvent } from 'leaflet';
 
+// Leaflet 1.9 ends a zoom animation on a timer that map.remove() does not clear; leaving a page mid-zoom then
+// throws "_leaflet_pos" on the removed map. Skip the callback once the map's panes are gone.
+const mapProto = L.Map.prototype as unknown as { _onZoomTransitionEnd: (this: { _mapPane?: HTMLElement }) => void };
+const onZoomTransitionEnd = mapProto._onZoomTransitionEnd;
+mapProto._onZoomTransitionEnd = function () {
+  if (this._mapPane) onZoomTransitionEnd.call(this);
+};
+
 // Nha Trang (Khánh Hoà): demo area and map start when the user's position is unknown.
 export const DEFAULT_CENTER: [number, number] = [12.2388, 109.1967];
 
