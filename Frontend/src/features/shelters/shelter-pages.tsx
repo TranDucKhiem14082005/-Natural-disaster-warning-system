@@ -9,7 +9,7 @@ import type { EvacuationPlan, GeoPolygon, MapLayers, Paginated, Shelter } from '
 import { BaseMap, FitBounds, FlyTo, MapClick, pinIcon, ringToLatLngs } from '../../components/map/base-map';
 import { AnchorButton, Badge, Button, Callout, Card, EmptyState, LinkButton, ListSkeleton, PageHeader, SegmentedControl, Skeleton } from '../../components/ui';
 import { SEVERITY_COLORS, fmtDistance } from '../../utils/format';
-import { directionsUrl, walkingMinutes } from '../../utils/directions';
+import { directionsPath, walkingMinutes } from '../../utils/directions';
 import { AmenityList, AvailabilityBadge, CapacityBar } from './shelter-parts';
 
 export function SheltersPage() {
@@ -98,9 +98,7 @@ export function SheltersPage() {
                 <Popup>
                   <p className="font-semibold">{s.name}</p>
                   <p>{s.available_slots > 0 ? `Còn ${s.available_slots} chỗ` : 'Đã đầy'}</p>
-                  <a href={directionsUrl(geo.position, s)} target="_blank" rel="noreferrer">
-                    Chỉ đường
-                  </a>
+                  <Link to={directionsPath(s, { from: geo.position, fromName: 'Vị trí của tôi' })}>Chỉ đường</Link>
                 </Popup>
               </Marker>
             ))}
@@ -136,9 +134,9 @@ function ShelterCard({ shelter: s, origin, active, onShow }: { shelter: Shelter;
         <AmenityList amenities={s.amenities} />
       </div>
       <div className="mt-4 flex gap-2">
-        <AnchorButton href={directionsUrl(origin, s)} target="_blank" rel="noreferrer" variant="soft" icon={Navigation} className="flex-1 whitespace-nowrap px-3">
+        <LinkButton to={directionsPath(s, { from: origin, fromName: 'Vị trí của tôi' })} variant="soft" icon={Navigation} className="flex-1 whitespace-nowrap px-3">
           Chỉ đường
-        </AnchorButton>
+        </LinkButton>
         <Button variant="secondary" icon={MapIcon} onClick={onShow} className="flex-1 whitespace-nowrap px-3">
           Xem bản đồ
         </Button>
@@ -269,9 +267,9 @@ export function EvacuationPage() {
                   <p className="mt-3 text-xs text-slate-500">Tuyến trên bản đồ là đường chim bay. Hãy đi theo đường lớn, tránh khu vực ngập và dòng nước chảy xiết.</p>
                 )}
                 <div className="mt-4 grid gap-2">
-                  <AnchorButton href={directionsUrl(origin, plan.shelter)} target="_blank" rel="noreferrer" size="lg" icon={Navigation} block>
+                  <LinkButton to={directionsPath(plan.shelter, { from: origin, fromName: origin === geo.position ? 'Vị trí của tôi' : undefined })} size="lg" icon={Navigation} block>
                     Dẫn đường đi bộ
-                  </AnchorButton>
+                  </LinkButton>
                   {plan.shelter.contact_phone && (
                     <AnchorButton href={`tel:${plan.shelter.contact_phone}`} size="lg" variant="secondary" icon={Phone} block>
                       Gọi {plan.shelter.contact_phone}

@@ -150,7 +150,10 @@ class Alert extends Model
                 $radiusM = (float) ($filters['radius_km'] ?? 10) * 1000;
                 $q->where(fn ($w) => $w
                     ->whereRaw(Geo::containsPointSql($this->qualifyColumn('area'), $lat, $lng))
-                    ->orWhereRaw(Geo::distanceSql("ST_Centroid({$this->qualifyColumn('area')})", $lat, $lng).' <= ?', [$radiusM]));
+                    // MySQL 8 has no ST_Centroid for geographic SRS; the stored center is the area's centre.
+                    ->orWhereRaw(Geo::distanceSql(
+                        Geo::pointFromColumnsSql($this->qualifyColumn('center_lat'), $this->qualifyColumn('center_lng')), $lat, $lng
+                    ).' <= ?', [$radiusM]));
             });
     }
 

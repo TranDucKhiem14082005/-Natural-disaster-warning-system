@@ -10,7 +10,7 @@ Tài liệu dự án · Học phần *Phát triển mã nguồn mở (PTMNM)*
 ![PHP](https://img.shields.io/badge/PHP-8.2-777BB4?logo=php&logoColor=white)
 ![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=black)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.6-3178C6?logo=typescript&logoColor=white)
-![MariaDB](https://img.shields.io/badge/MariaDB-10.4_GIS-003545?logo=mariadb&logoColor=white)
+![MySQL](https://img.shields.io/badge/MySQL-8.4_GIS-4479A1?logo=mysql&logoColor=white)
 ![Leaflet](https://img.shields.io/badge/Leaflet-OpenStreetMap-199900?logo=leaflet&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white)
 
@@ -48,7 +48,7 @@ Người dân xem điểm trú ẩn còn chỗ, tuyến sơ tán, gửi báo cá
 
 **Điểm nổi bật**
 
-- **Geofencing bằng MariaDB GIS:** đối chiếu vùng cảnh báo với vị trí quan tâm bằng `ST_Contains`, SRID 4326.
+- **Geofencing bằng MySQL 8.4 GIS:** đối chiếu vùng cảnh báo với vị trí quan tâm bằng `ST_Contains`, SRID 4326.
 - **Vòng đời cảnh báo có phiên bản:** Nháp, Chờ duyệt, Phát hành, Cập nhật, Kết thúc. Mỗi thay đổi đều lưu phiên bản.
 - **Realtime qua Laravel Reverb:** bản đồ, thông báo và trạng thái SOS cập nhật không cần tải lại trang.
 - **Dữ liệu mở:** Open-Meteo (mưa, gió) và USGS (động đất) lấy định kỳ. Mưa vượt ngưỡng thì tự đề xuất cảnh báo lũ.
@@ -227,7 +227,7 @@ Mở `http://localhost:8000`. Tài khoản demo: `admin`, `officer`, `rescuer`, 
 | Backend | [Backend/README.md](../Backend/README.md) | Cài đặt Laravel bằng XAMPP, chạy server, queue, Reverb, scheduler |
 | Frontend | [Frontend/README.md](../Frontend/README.md) | Cài đặt SPA, biến môi trường `VITE_*`, cấu trúc `src/` |
 | Infra | [Infra/README.md](../Infra/README.md) | Các service Docker Compose, chạy lần đầu, seed, Cloudflare Tunnel |
-| CI | [.github/workflows/ci.yml](../.github/workflows/ci.yml) | Pint + `php artisan test` trên MariaDB 10.4; kiểm tra và build image Docker |
+| CI | [.github/workflows/ci.yml](../.github/workflows/ci.yml) | Pint + `php artisan test` trên MySQL 8.4; kiểm tra và build image Docker |
 
 ---
 
@@ -236,7 +236,7 @@ Mở `http://localhost:8000`. Tài khoản demo: `admin`, `officer`, `rescuer`, 
 | Thành phần | Công nghệ |
 |---|---|
 | Backend | PHP 8.2, Laravel 12, REST API `/api/v1`, xác thực Laravel Sanctum (token) |
-| Cơ sở dữ liệu | MariaDB 10.4.32, dữ liệu không gian SRID 4326 (`POINT(lng lat)`, `ST_Contains`), quản trị bằng phpMyAdmin |
+| Cơ sở dữ liệu | MySQL 8.4 (Docker `mysql:8.4.6`), dữ liệu không gian SRID 4326 (`POINT(lng lat)`, `ST_Contains`), quản trị bằng phpMyAdmin của XAMPP |
 | Realtime | Laravel Reverb + Broadcasting (WebSocket), Laravel Echo phía client |
 | Hàng đợi, lịch | Laravel Database Queue, Laravel Scheduler |
 | Frontend | React 18, TypeScript, Vite 5, Tailwind CSS 3, lucide-react |

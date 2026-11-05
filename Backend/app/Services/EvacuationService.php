@@ -46,7 +46,7 @@ class EvacuationService
             ->whereNotExists(fn ($q) => $q->selectRaw('1')
                 ->from('alerts')
                 ->whereIn('alerts.status', ['published', 'updated'])
-                ->whereRaw('ST_Contains(alerts.area, shelters.location) = 1'))
+                ->whereRaw('ST_Contains(alerts.area, shelters.location)'))
             ->first();
     }
 

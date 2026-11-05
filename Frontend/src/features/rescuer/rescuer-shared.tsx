@@ -19,9 +19,9 @@ import {
 import { api, errorText } from '../../services/api';
 import { getEcho } from '../../services/echo';
 import type { Paginated, SosCondition, SosRequest, SosStatus } from '../../types/api';
-import { AnchorButton, Button, Callout, Modal, PRIORITY_BAR, PriorityBadge, SosStatusBadge, useToast } from '../../components/ui';
+import { AnchorButton, Button, LinkButton, Callout, Modal, PRIORITY_BAR, PriorityBadge, SosStatusBadge, useToast } from '../../components/ui';
 import { CONDITION_LABELS, SOS_NEXT, fmtDistance } from '../../utils/format';
-import { directionsUrl as osmDirectionsUrl } from '../../utils/directions';
+import { directionsPath } from '../../utils/directions';
 
 export const CONDITION_ICONS: Record<SosCondition, LucideIcon> = {
   injured: HeartPulse,
@@ -72,9 +72,9 @@ export function fmtDuration(fromIso: string | null, toIso: string | null): strin
   return `${Math.floor(min / 60)} giờ ${min % 60} phút`;
 }
 
-/** Driving directions to the victim on the OSM-based OSRM map. */
-export function directionsUrl(to: Pos, from?: Pos | null): string {
-  return osmDirectionsUrl(from, to, 'car');
+/** In-app driving directions from the rescuer to the victim; both ends stay editable on that page. */
+export function directionsUrl(to: Pos & { id?: number }, from?: Pos | null): string {
+  return directionsPath({ lat: to.lat, lng: to.lng, name: to.id ? `SOS #${to.id}` : undefined }, { from, fromName: from ? 'Vị trí của tôi' : undefined, mode: 'car', base: '/rescuer' });
 }
 
 /** Watches the device position quietly; null until the first fix or when denied. */
@@ -252,9 +252,9 @@ export function TaskCard({ sos, me, onChanged, now }: { sos: SosRequest; me: Pos
           <AnchorButton href={`tel:${sos.contact_phone}`} variant="secondary" size="lg" icon={Phone}>
             Gọi
           </AnchorButton>
-          <AnchorButton href={directionsUrl(sos, me)} target="_blank" rel="noreferrer" variant="secondary" size="lg" icon={Navigation}>
+          <LinkButton to={directionsUrl(sos, me)} variant="secondary" size="lg" icon={Navigation}>
             Chỉ đường
-          </AnchorButton>
+          </LinkButton>
         </div>
         <NextStepButton sos={sos} onDone={onChanged} size="lg" />
       </div>

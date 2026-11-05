@@ -4,10 +4,11 @@ import { CircleMarker, Marker, Polyline, Tooltip } from 'react-leaflet';
 import { CircleCheck, Clock, MapPin, Navigation, Phone, ShieldCheck, StickyNote, UserRound, Users } from 'lucide-react';
 import { api, ApiError, errorText } from '../../services/api';
 import type { SosRequest } from '../../types/api';
-import { BaseMap, FitBounds, pinIcon } from '../../components/map/base-map';
+import { BaseMap, FitBounds } from '../../components/map/base-map';
 import { AnchorButton, Badge, Callout, Card, LinkButton, PageHeader, PriorityBadge, Skeleton, SosStatusBadge } from '../../components/ui';
 import { fmtDateTime, fmtDistance } from '../../utils/format';
 import { ConditionChips, NextStepButton, PRIORITY_HEX, directionsUrl, distanceM, fmtDuration, timeAgo, useMyPosition, useSosLive } from './rescuer-shared';
+import { SignalAddress, signalIcon } from '../../components/map/signal-location';
 
 export function RescuerTaskPage() {
   const { id } = useParams();
@@ -89,7 +90,7 @@ export function RescuerTaskPage() {
           <div className="overflow-hidden rounded-2xl border border-slate-200/80 shadow-card">
             <BaseMap center={victim} zoom={15} className="h-72 rounded-none border-0 sm:h-96">
               <FitBounds bounds={bounds} />
-              <Marker position={victim} icon={pinIcon(PRIORITY_HEX[sos.priority] ?? '#dc2626', 'SOS')}>
+              <Marker position={victim} icon={signalIcon(PRIORITY_HEX[sos.priority] ?? '#dc2626', 'SOS')}>
                 <Tooltip direction="top" offset={[0, -26]} permanent>
                   Nạn nhân
                 </Tooltip>
@@ -111,6 +112,7 @@ export function RescuerTaskPage() {
               <span className="text-slate-500">
                 {sos.lat.toFixed(5)}, {sos.lng.toFixed(5)}
               </span>
+              <SignalAddress lat={sos.lat} lng={sos.lng} className="w-full text-slate-600" />
             </div>
           </div>
 
@@ -133,9 +135,9 @@ export function RescuerTaskPage() {
               <AnchorButton href={`tel:${sos.contact_phone}`} size="lg" icon={Phone}>
                 Gọi ngay
               </AnchorButton>
-              <AnchorButton href={directionsUrl(sos, me)} target="_blank" rel="noreferrer" variant="secondary" size="lg" icon={Navigation}>
+              <LinkButton to={directionsUrl(sos, me)} variant="secondary" size="lg" icon={Navigation}>
                 Chỉ đường
-              </AnchorButton>
+              </LinkButton>
             </div>
           </Card>
 

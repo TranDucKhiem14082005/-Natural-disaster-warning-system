@@ -11,7 +11,8 @@ import type { EvacuationPlan, GeoPolygon, MapLayers } from '../../types/api';
 import { BaseMap, FitBounds, FlyTo, pinIcon, ringToLatLngs } from '../../components/map/base-map';
 import { Button, Callout, IconButton } from '../../components/ui';
 import { AMENITY_LABELS, CONDITION_LABELS, SEVERITY_COLORS, SEVERITY_LABELS, SOS_STATUS_LABELS, fmtDateTime, fmtDistance } from '../../utils/format';
-import { directionsUrl, walkingMinutes } from '../../utils/directions';
+import { directionsPath, walkingMinutes } from '../../utils/directions';
+import { SignalAddress } from '../../components/map/signal-location';
 
 type LayerKey = 'alerts' | 'shelters' | 'reports' | 'sos';
 
@@ -111,9 +112,7 @@ export function MapPage() {
                   {p.available_slots > 0 ? `Còn ${p.available_slots}/${p.capacity} chỗ` : 'Đã đầy'}
                 </p>
                 {!!p.amenities?.length && <p className="text-slate-600">{p.amenities.map((a) => AMENITY_LABELS[a]).join(' · ')}</p>}
-                <a href={directionsUrl(geo.position, { lat, lng })} target="_blank" rel="noreferrer">
-                  Chỉ đường
-                </a>
+                <Link to={directionsPath({ lat, lng, name: p.name }, { from: geo.position, fromName: 'Vị trí của tôi' })}>Chỉ đường</Link>
               </Popup>
             </Marker>
           );
@@ -149,7 +148,8 @@ export function MapPage() {
                   Ưu tiên {p.priority} · {p.people_count} người
                   {p.conditions?.length ? ` · ${p.conditions.map((c) => CONDITION_LABELS[c]).join(', ')}` : ''}
                 </p>
-                <Link to="/officer/sos">Mở điều phối SOS</Link>
+                <SignalAddress lat={lat} lng={lng} />
+                <Link to={`/officer/sos?sos=${p.id}`}>Mở điều phối SOS</Link>
               </Popup>
             </Marker>
           );
@@ -227,15 +227,13 @@ export function MapPage() {
               <IconButton icon={X} label="Đóng tuyến" size="sm" onClick={() => setPlan(null)} />
             </div>
             <div className="mt-3 grid grid-cols-2 gap-2">
-              <a
-                href={directionsUrl(geo.position, plan.shelter)}
-                target="_blank"
-                rel="noreferrer"
+              <Link
+                to={directionsPath(plan.shelter, { from: geo.position, fromName: 'Vị trí của tôi' })}
                 className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-brand-600 text-sm font-semibold text-white hover:bg-brand-700"
               >
                 <Navigation className="h-4 w-4" aria-hidden />
                 Dẫn đường
-              </a>
+              </Link>
               <Link to="/evacuation" className="inline-flex h-11 items-center justify-center rounded-xl border border-slate-300 text-sm font-semibold text-slate-700 hover:bg-slate-50">
                 Xem chi tiết
               </Link>

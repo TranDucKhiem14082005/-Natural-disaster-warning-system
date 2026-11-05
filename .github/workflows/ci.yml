@@ -11,23 +11,24 @@ concurrency:
 
 jobs:
   backend:
-    name: Backend - lint + test (MariaDB 10.4)
+    name: Backend - lint + test (MySQL 8.4)
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: Backend
     services:
-      mariadb:
-        image: mariadb:10.4.32
+      mysql:
+        image: mysql:8.4.6
         env:
-          MARIADB_ROOT_PASSWORD: root
-          MARIADB_DATABASE: disaster_warning_test
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: disaster_warning_test
         ports:
           - 3306:3306
         options: >-
           --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot -proot --silent"
           --health-interval=5s --health-timeout=5s --health-retries=30
     env:
+      DB_CONNECTION: mysql
       DB_HOST: 127.0.0.1
       DB_PORT: 3306
       DB_USERNAME: root

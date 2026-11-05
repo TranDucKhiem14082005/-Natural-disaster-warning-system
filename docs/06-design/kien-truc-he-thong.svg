@@ -62,10 +62,10 @@
 
   <!-- db -->
   <rect x="360" y="412" width="230" height="96" rx="12" fill="#ecfdf5" stroke="#34d399" stroke-width="1.5"/>
-  <text x="378" y="440" class="t">db · MariaDB 10.4.32</text>
+  <text x="378" y="440" class="t">db · MySQL 8.4.6</text>
   <text x="378" y="460" class="s">GIS SRID 4326, POINT(lng lat)</text>
   <text x="378" y="477" class="s">Spatial index · bảng jobs</text>
-  <text x="378" y="494" class="s">Volume db-data</text>
+  <text x="378" y="494" class="s">Volume mysql-data</text>
 
   <!-- queue -->
   <rect x="610" y="412" width="230" height="96" rx="12" fill="#fffbeb" stroke="#fbbf24" stroke-width="1.5"/>

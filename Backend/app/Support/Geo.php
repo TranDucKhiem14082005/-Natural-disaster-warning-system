@@ -6,7 +6,9 @@ use Illuminate\Contracts\Database\Query\Expression;
 use Illuminate\Support\Facades\DB;
 
 /**
- * WKT helpers. Coordinates are always stored as (lng lat) with SRID 4326.
+ * WKT helpers for MySQL 8. Coordinates are always written as (lng lat) with SRID 4326.
+ * SRID 4326 is geographic in MySQL 8 and its default WKT axis order is lat-long,
+ * so every ST_GeomFromText call passes 'axis-order=long-lat'.
  */
 class Geo
 {
@@ -16,7 +18,7 @@ class Geo
 
     public static function point(float $lat, float $lng): Expression
     {
-        return DB::raw(sprintf("ST_GeomFromText('POINT(%F %F)', %d)", $lng, $lat, self::SRID));
+        return DB::raw(self::pointSql($lat, $lng));
     }
 
     /** @param list<array{0: float, 1: float}> $ring [lng, lat] pairs */
@@ -28,7 +30,7 @@ class Geo
 
         $coords = implode(',', array_map(fn ($p) => sprintf('%F %F', $p[0], $p[1]), $ring));
 
-        return DB::raw(sprintf("ST_GeomFromText('POLYGON((%s))', %d)", $coords, self::SRID));
+        return DB::raw(self::fromWkt("POLYGON(({$coords}))"));
     }
 
     /** @return list<array{0: float, 1: float}> closed ring approximating a circle, [lng, lat] pairs */
@@ -50,15 +52,30 @@ class Geo
         return $ring;
     }
 
+    public static function pointSql(float $lat, float $lng): string
+    {
+        return self::fromWkt(sprintf('POINT(%F %F)', $lng, $lat));
+    }
+
+    /** Point SQL built from plain lat/lng columns (x = lng, y = lat, same SRID as the spatial columns). */
+    public static function pointFromColumnsSql(string $latColumn, string $lngColumn): string
+    {
+        return sprintf('ST_SRID(POINT(%s, %s), %d)', $lngColumn, $latColumn, self::SRID);
+    }
+
+    /** Great-circle distance in meters; both arguments must be SRID 4326. */
     public static function distanceSql(string $column, float $lat, float $lng): string
     {
-        return sprintf("ST_Distance_Sphere(%s, ST_GeomFromText('POINT(%F %F)', %d))", $column, $lng, $lat, self::SRID);
+        return sprintf('ST_Distance_Sphere(%s, %s)', $column, self::pointSql($lat, $lng));
     }
 
     public static function containsPointSql(string $areaColumn, float $lat, float $lng): string
     {
-        // "= 1" keeps the optimizer off the spatial index: MariaDB 10.4.32 fails an autocommit SELECT that probes it
-        // with a constant point (error 1207 "Update locks cannot be acquired during a READ UNCOMMITTED transaction").
-        return sprintf("ST_Contains(%s, ST_GeomFromText('POINT(%F %F)', %d)) = 1", $areaColumn, $lng, $lat, self::SRID);
+        return sprintf('ST_Contains(%s, %s)', $areaColumn, self::pointSql($lat, $lng));
+    }
+
+    private static function fromWkt(string $wkt): string
+    {
+        return sprintf("ST_GeomFromText('%s', %d, 'axis-order=long-lat')", $wkt, self::SRID);
     }
 }

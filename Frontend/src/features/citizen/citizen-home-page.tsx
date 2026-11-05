@@ -23,6 +23,7 @@ import { useFetch } from '../../hooks/use-fetch';
 import type { Alert, CitizenDashboard, Dashboard, Shelter, UserLocation } from '../../types/api';
 import { Badge, Callout, Card, EmptyState, LinkButton, PageHeader, SeverityBadge, Skeleton, SosStatusBadge, StatCard } from '../../components/ui';
 import { fmtDateTime, fmtDistance } from '../../utils/format';
+import { directionsPath } from '../../utils/directions';
 
 const ACTIONS: { to: string; label: string; hint: string; icon: LucideIcon; tone: string }[] = [
   { to: '/sos', label: 'Gửi SOS', hint: 'Cầu cứu khẩn cấp', icon: Siren, tone: 'bg-red-600 text-white' },
@@ -230,7 +231,7 @@ function LocationCard({ location, alerts, shelter }: { location: UserLocation; a
                 {fmtDistance(shelter.distance_m)} · còn {shelter.available_slots} chỗ
               </p>
             </div>
-            <LinkButton to={`/evacuation?lat=${location.lat}&lng=${location.lng}`} size="sm" variant={danger ? 'primary' : 'secondary'} icon={Route}>
+            <LinkButton to={directionsPath(shelter)} size="sm" variant={danger ? 'primary' : 'secondary'} icon={Route}>
               Chỉ đường
             </LinkButton>
           </div>
