@@ -18,6 +18,6 @@ class GeofenceService
                 ->crossJoin('alerts')
                 ->where('alerts.id', $alert->id)
                 ->whereColumn('user_locations.user_id', 'users.id')
-                ->whereRaw('ST_Contains(alerts.area, user_locations.location) = 1'));
+                ->whereRaw('ST_Contains(alerts.area, user_locations.location)'));
     }
 }

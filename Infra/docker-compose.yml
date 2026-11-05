@@ -1,4 +1,4 @@
-# Phuong an B (dac ta muc 10): Nginx + PHP-FPM (Laravel) + MariaDB + phpMyAdmin,
+# Phuong an B (dac ta muc 10): Nginx + PHP-FPM (Laravel) + MySQL 8.4 + phpMyAdmin,
 # kem worker queue, scheduler, Reverb. Chay trong Infra/: docker compose up -d --build
 
 x-laravel: &laravel
@@ -19,7 +19,7 @@ x-laravel: &laravel
     LOG_CHANNEL: stderr
     LOG_LEVEL: ${LOG_LEVEL:-info}
 
-    DB_CONNECTION: mariadb
+    DB_CONNECTION: mysql
     DB_HOST: db
     DB_PORT: 3306
     DB_DATABASE: ${DB_DATABASE:-disaster_warning}
@@ -61,21 +61,22 @@ x-laravel: &laravel
 
 services:
   db:
-    image: ${MARIADB_IMAGE:-mariadb:10.4.32}
+    image: ${MYSQL_IMAGE:-mysql:8.4.6}
     restart: unless-stopped
     environment:
-      MARIADB_DATABASE: ${DB_DATABASE:-disaster_warning}
-      MARIADB_USER: ${DB_USERNAME:-dws}
-      MARIADB_PASSWORD: ${DB_PASSWORD:?Dat DB_PASSWORD trong Infra/.env}
-      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:?Dat DB_ROOT_PASSWORD trong Infra/.env}
+      MYSQL_DATABASE: ${DB_DATABASE:-disaster_warning}
+      MYSQL_USER: ${DB_USERNAME:-dws}
+      MYSQL_PASSWORD: ${DB_PASSWORD:?Dat DB_PASSWORD trong Infra/.env}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:?Dat DB_ROOT_PASSWORD trong Infra/.env}
     command: ["--character-set-server=utf8mb4", "--collation-server=utf8mb4_unicode_ci"]
     volumes:
-      - db-data:/var/lib/mysql
+      # New volume: MySQL cannot open the old MariaDB data dir (db-data is left untouched).
+      - mysql-data:/var/lib/mysql
     ports:
       # Only on localhost; 3307 avoids clashing with XAMPP's 3306.
       - "127.0.0.1:${DB_HOST_PORT:-3307}:3306"
     healthcheck:
-      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p\"$$MARIADB_ROOT_PASSWORD\" --silent"]
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p\"$$MYSQL_ROOT_PASSWORD\" --silent"]
       interval: 5s
       timeout: 5s
       retries: 30
@@ -145,5 +146,5 @@ services:
       - nginx
 
 volumes:
-  db-data:
+  mysql-data:
   storage:
