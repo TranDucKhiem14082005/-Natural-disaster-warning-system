@@ -87,6 +87,18 @@ Thanh điều hướng công khai: Trang chủ, Bản đồ, Cảnh báo, Sự k
   - Có `ORS_API_KEY` (OpenRouteService) thì vẽ tuyến theo đường thật. Không có thì vẽ đường chim bay.
   - Ví dụ demo: từ nhà `citizen` ở Ngọc Hiệp, đích là **Trường Đại học Khánh Hoà**, cách khoảng 4,3 km.
 
+### Chỉ đường (`/directions`)
+Mọi nút **Chỉ đường** / **Dẫn đường** tới điểm trú ẩn (Bản đồ, Điểm trú ẩn, Tuyến sơ tán, Trang của tôi) đều mở trang này:
+- **Điểm xuất phát (A)** mặc định là **vị trí hiện tại** (GPS). **Điểm đến (B)** là điểm trú ẩn vừa chọn.
+- Đổi được cả hai điểm theo 4 cách:
+  1. **gõ địa chỉ** (vd "Chợ Đầm Nha Trang") rồi chọn trong danh sách gợi ý;
+  2. **gõ toạ độ** dạng `vĩ độ, kinh độ` (vd `12.2388, 109.1967`) rồi Enter: ghim đặt đúng toạ độ đã nhập;
+  3. bấm **Chọn trên bản đồ** rồi bấm lên bản đồ;
+  4. **kéo ghim** A hoặc B.
+- Nút **Vị trí của tôi** lấy lại GPS cho điểm xuất phát; nút mũi tên đổi chiều A ↔ B.
+- Chọn phương tiện **Đi bộ / Xe máy - ô tô / Xe đạp**. Hệ thống vẽ tuyến theo đường thật (OSRM, dữ liệu OpenStreetMap), hiện quãng đường và thời gian. Vùng cảnh báo được tô màu để tránh. Không tính được tuyến thì vẽ đường chim bay (nét đứt).
+- **Xem từng chặng rẽ** mở cùng tuyến trên bản đồ dẫn đường bên ngoài.
+
 ### Báo cáo cộng đồng (`/reports`, `/reports/:id`)
 - Xem các báo cáo người dân **đã được cán bộ duyệt**: loại sự cố, mô tả, ảnh/video, vị trí, thời điểm.
 - Lọc **Gần tôi (10 km)**.
@@ -179,7 +191,8 @@ Cổng `/rescuer` thiết kế cho điện thoại, có thanh điều hướng d
 
 ### Chi tiết nhiệm vụ (`/rescuer/sos/:id`)
 - **Liên hệ nạn nhân:** tên, số điện thoại, nút **Gọi ngay**.
-- **Chỉ đường:** mở bản đồ dẫn đường OSRM (OpenStreetMap) từ vị trí của bạn tới nạn nhân.
+- **Chỉ đường:** mở trang Chỉ đường trong ứng dụng (`/rescuer/directions`), từ vị trí hiện tại của đội tới vị trí phát tín hiệu SOS, mặc định đi xe máy / ô tô. Sửa được điểm đi, điểm đến như mục Chỉ đường ở 1.2.
+- Bản đồ nhiệm vụ đánh dấu nạn nhân bằng ghim nhấp nháy, kèm toạ độ và **địa chỉ gần nhất** của tín hiệu.
 - Số người, tình trạng (bị thương, mắc kẹt...), ghi chú, mức ưu tiên, nhãn "Đã xác minh" nếu cán bộ đã xác minh.
 - **Tiến trình:** mỗi lần chỉ có một nút cho bước tiếp theo, và hệ thống hỏi xác nhận trước khi chuyển:
   1. **Tiếp nhận nhiệm vụ** (chỉ khi yêu cầu còn ở trạng thái Mới);
@@ -212,7 +225,11 @@ Cổng `/officer` có thanh bên gồm: Tổng quan, Điều phối SOS, Cảnh 
 ### Điều phối SOS (`/officer/sos`)
 - **Lọc:** trạng thái (Đang mở, Tất cả, từng trạng thái), ưu tiên tối thiểu, tìm theo mã, số điện thoại hoặc tên.
 - Bản đồ ghim SOS (số trên ghim là mức ưu tiên) cùng danh sách.
-- Chọn một yêu cầu để thấy người cần hỗ trợ, số người, tình trạng, liên hệ (bấm gọi) và tiến trình.
+- **Bấm vào một yêu cầu** (trong danh sách hoặc ghim trên bản đồ):
+  - bản đồ lớn bay tới đúng vị trí tín hiệu, ghim đó nhấp nháy;
+  - ngăn chi tiết mở mục **Vị trí phát tín hiệu**: bản đồ thu nhỏ quanh điểm GPS, toạ độ, địa chỉ gần nhất, nút **Chép toạ độ** và **Chỉ đường tới đây**;
+  - tiếp theo là người cần hỗ trợ, số người, tình trạng, liên hệ (bấm gọi) và tiến trình.
+- Đường dẫn `/officer/sos?sos=<id>` mở thẳng một yêu cầu. Ở Tổng quan, nút **Xem vị trí** cạnh mỗi SOS, và ghim SOS trên Bản đồ (`/map`), đều dẫn tới đây.
 - **Xác minh** / **Bỏ xác minh** sau khi gọi điện xác nhận yêu cầu là thật.
 - **Phân công đội cứu hộ:**
   - hệ thống **gợi ý** đội theo số việc đang làm ít nhất và khoảng cách gần nhất;
@@ -387,7 +404,7 @@ Chưa làm các phần sau: GDACS, Web Push / Telegram, xuất CAP XML / RSS, đ
 |---|---|---|
 | **A. Docker (khuyên dùng)** | Chạy demo nhanh, giống môi trường triển khai | Web + API + realtime ở `http://localhost:8000` |
 | **B. Docker backend + Vite dev** | Sửa giao diện, cần hot reload | SPA dev ở `http://localhost:5173` |
-| **C. XAMPP + Vite dev** | Không dùng Docker, phát triển backend | API `:8000`, Reverb `:8080`, SPA `:5173` |
+| **C. XAMPP + MySQL 8.4 + Vite dev** | Phát triển backend bằng `php artisan serve` (XAMPP cho PHP + phpMyAdmin) | API `:8000`, Reverb `:8080`, SPA `:5173` |
 | **D. VPS (Docker)** | Demo công khai cho giảng viên, bạn bè | `http://<IP-VPS>` |
 
 Không chạy XAMPP (`php artisan serve`) và Docker cùng lúc vì cả hai dùng cổng 8000.
@@ -397,7 +414,8 @@ Không chạy XAMPP (`php artisan serve`) và Docker cùng lúc vì cả hai dù
 - Git.
 - Cách A, B, D: **Docker Desktop** (Windows/macOS, bật WSL2) hoặc Docker Engine + Compose v2.20+ (Linux).
 - Cách B, C: **Node.js 18+** (đã thử Node 22/25).
-- Cách C: **XAMPP** (PHP 8.2+, MariaDB 10.4.32), **Composer 2**. Bật các extension PHP `pdo_mysql`, `mbstring`, `gd`, `zip`, `intl`, `bcmath`.
+- Cơ sở dữ liệu: **MySQL 8.4** (bắt buộc). Cách A, B, D dùng sẵn image `mysql:8.4.6` trong Docker.
+- Cách C: **XAMPP** (chỉ dùng Apache + PHP 8.2+ + phpMyAdmin), **Composer 2**, và **MySQL 8.4**: MySQL trong Docker (`Infra/`, cổng 3307) hoặc **MySQL Community Server 8.4** cài riêng (cổng 3306). Module MySQL của XAMPP là MariaDB 10.4, không dùng làm CSDL của dự án. Bật các extension PHP `pdo_mysql`, `mbstring`, `gd`, `zip`, `intl`, `bcmath`.
 
 Lấy mã nguồn:
 
@@ -418,8 +436,10 @@ Docker Compose ở thư mục `Infra/` gồm các service:
 | `queue` | `queue:work`: gửi thông báo, broadcast |
 | `scheduler` | `schedule:work`: thời tiết mỗi giờ, động đất 30 phút |
 | `reverb` | WebSocket |
-| `db` | MariaDB 10.4.32 (volume `db-data`) |
-| `phpmyadmin` | Quản trị CSDL |
+| `db` | MySQL 8.4 (image `mysql:8.4.6`, volume `mysql-data`) |
+| `phpmyadmin` | Quản trị CSDL tại `127.0.0.1:8081` (có thể dùng phpMyAdmin của XAMPP thay thế, xem bên dưới) |
+
+Chuyển từ MariaDB sang MySQL 8.4: MySQL không mở được dữ liệu cũ của MariaDB, nên `db` dùng volume mới `mysql-data` (CSDL trống, phải chạy lại bước 3 `db:seed`). Volume MariaDB cũ `db-data` vẫn được giữ nguyên; khi không cần nữa thì xoá bằng `docker volume rm disaster-warning_db-data`.
 
 **Bước 1 - Tạo file cấu hình** (chỉ lần đầu):
 
@@ -461,9 +481,23 @@ docker compose exec app php artisan db:seed --force
 | http://localhost:8000 | Giao diện web (đủ 4 cổng) |
 | http://localhost:8000/api/v1 | REST API |
 | http://127.0.0.1:8081 | phpMyAdmin (user `dws` hoặc `root`, mật khẩu `DB_PASSWORD` / `DB_ROOT_PASSWORD` trong `Infra/.env`) |
-| `127.0.0.1:3307` | MariaDB từ máy host |
+| `127.0.0.1:3307` | MySQL 8.4 từ máy host |
+| http://localhost/phpmyadmin | phpMyAdmin của XAMPP, sau khi thêm server MySQL 8.4 (cổng 3307) như dưới đây |
 
 Đăng nhập bằng tài khoản demo ở mục 1.1.
+
+**Quản lý CSDL bằng phpMyAdmin của XAMPP:** nhóm vẫn dùng phpMyAdmin của XAMPP (`C:\xampp\phpMyAdmin`, bản 5.2.1) để quản lý MySQL 8.4. Thêm một server vào cuối file `C:\xampp\phpMyAdmin\config.inc.php`:
+
+```php
+$i++;
+$cfg['Servers'][$i]['verbose'] = 'MySQL 8.4 - du an (Docker :3307)';
+$cfg['Servers'][$i]['host'] = '127.0.0.1';
+$cfg['Servers'][$i]['port'] = '3307';
+$cfg['Servers'][$i]['auth_type'] = 'cookie';
+$cfg['Servers'][$i]['AllowNoPassword'] = false;
+```
+
+Bật Apache trong XAMPP Control Panel, mở `http://localhost/phpmyadmin`, chọn server "MySQL 8.4 - du an (Docker :3307)" rồi đăng nhập bằng `dws` / `DB_PASSWORD` hoặc `root` / `DB_ROOT_PASSWORD` trong `Infra/.env`. phpMyAdmin trong Docker (`http://127.0.0.1:8081`) vẫn dùng được thay thế.
 
 **Lệnh thường dùng** (trong `Infra/`):
 
@@ -482,7 +516,7 @@ Muốn làm lại dữ liệu từ đầu: chạy `docker compose down -v`, rồ
 Sao lưu CSDL:
 
 ```bash
-docker compose exec db sh -c 'mysqldump -uroot -p"$MARIADB_ROOT_PASSWORD" "$MARIADB_DATABASE"' > backup.sql
+docker compose exec db sh -c 'mysqldump -uroot -p"$MYSQL_ROOT_PASSWORD" "$MYSQL_DATABASE"' > backup.sql
 ```
 
 Link công khai tạm thời khi demo (Cloudflare Quick Tunnel, không cần tài khoản):
@@ -520,12 +554,18 @@ Vite tự proxy `/api`, `/storage`, `/app` về backend nên không cần cấu 
 
 Lệnh khác: `npm run typecheck`, `npm run build` (ra `dist/`), `npm run preview`.
 
-## 2.5. Cách C - Chạy bằng XAMPP (không Docker)
+## 2.5. Cách C - Chạy bằng XAMPP (không Docker cho backend)
+
+XAMPP chỉ đóng vai trò **Apache + PHP + phpMyAdmin**. CSDL là **MySQL 8.4**, không phải MariaDB đi kèm XAMPP.
 
 **Backend:**
 
-1. Mở XAMPP Control Panel, bật **MySQL**. Vào phpMyAdmin (`http://localhost/phpmyadmin`), tạo 2 database `disaster_warning` và `disaster_warning_test` (collation `utf8mb4_unicode_ci`).
-2. Trong `Backend/`:
+1. Chuẩn bị MySQL 8.4, chọn một trong hai:
+   - **Phương án A - MySQL trong Docker:** trong `Infra/` chạy `docker compose up -d db` (cổng `127.0.0.1:3307`, tài khoản trong `Infra/.env`).
+   - **Phương án B - MySQL Community Server 8.4 cài trên máy** (cổng 3306): trước đó **tắt module MySQL (MariaDB) trong XAMPP Control Panel** để tránh trùng cổng 3306, hoặc cho MySQL 8.4 chạy cổng khác.
+2. Thêm server MySQL 8.4 vào phpMyAdmin của XAMPP: cuối file `C:\xampp\phpMyAdmin\config.inc.php` thêm khối `$cfg['Servers'][$i]` như mục 2.3 (phương án A: `port` = `3307`; phương án B: `port` = `3306`, `verbose` = `'MySQL 8.4 (:3306)'`). Bật Apache, mở `http://localhost/phpmyadmin`, chọn server MySQL 8.4 và đăng nhập.
+3. Trong phpMyAdmin (hoặc MySQL Workbench), tạo 2 database `disaster_warning` và `disaster_warning_test` (collation `utf8mb4_unicode_ci`). Phương án A đã tự tạo sẵn `disaster_warning`.
+4. Trong `Backend/`:
 
 ```bash
 composer install
@@ -536,14 +576,15 @@ php artisan migrate --seed
 php artisan storage:link
 ```
 
-3. Kiểm tra `Backend/.env`:
+5. Kiểm tra `Backend/.env`:
 
 ```dotenv
+DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
-DB_PORT=3306
+DB_PORT=3306                 # phương án A (Docker): 3307
 DB_DATABASE=disaster_warning
-DB_USERNAME=root
-DB_PASSWORD=
+DB_USERNAME=root             # phương án A: root hoặc dws
+DB_PASSWORD=<mật khẩu MySQL> # phương án A: DB_ROOT_PASSWORD / DB_PASSWORD trong Infra/.env
 BROADCAST_CONNECTION=reverb
 REVERB_HOST=localhost
 REVERB_PORT=8080
@@ -551,7 +592,7 @@ REVERB_SCHEME=http
 FRONTEND_URL=http://localhost:5173
 ```
 
-4. Chạy 4 tiến trình, mỗi lệnh một terminal, trong `Backend/`:
+6. Chạy 4 tiến trình, mỗi lệnh một terminal, trong `Backend/`:
 
 ```bash
 php artisan serve          # API  http://127.0.0.1:8000/api/v1
@@ -573,7 +614,7 @@ vendor/bin/pint --test      # kiểm tra code style
 php artisan test            # 28 test (geofencing, vòng đời cảnh báo, SOS, quyền...)
 ```
 
-Nếu dùng DB của Docker thay cho XAMPP, đặt biến môi trường trước khi chạy `php artisan test`:
+Nếu dùng MySQL của Docker (cổng 3307), đặt biến môi trường trước khi chạy `php artisan test`:
 
 ```bash
 DB_HOST=127.0.0.1 DB_PORT=3307 DB_USERNAME=root DB_PASSWORD=<DB_ROOT_PASSWORD trong Infra/.env> php artisan test
@@ -581,7 +622,7 @@ DB_HOST=127.0.0.1 DB_PORT=3307 DB_USERNAME=root DB_PASSWORD=<DB_ROOT_PASSWORD tr
 
 **Frontend:** `npm run typecheck` và `npm run build`.
 
-**CI:** GitHub Actions (`.github/workflows/ci.yml`) chạy Pint + test trên MariaDB 10.4.32, kiểm tra `docker compose config` và build image cho mỗi PR và mỗi lần push vào `main`.
+**CI:** GitHub Actions (`.github/workflows/ci.yml`) chạy Pint + test trên MySQL 8.4, kiểm tra `docker compose config` và build image cho mỗi PR và mỗi lần push vào `main`.
 
 ## 2.7. Cách D - Triển khai lên VPS (Docker)
 
@@ -671,7 +712,7 @@ curl http://localhost/up
 
 Trên VPS **không dùng** `docker compose up -d --build`. Năm service dùng chung một image, build song song dễ lỗi `image already exists`. Build trước bằng `docker compose build migrate nginx`, sau đó mới `up`.
 
-Mở `http://<IP-VPS>` trên trình duyệt. MariaDB và phpMyAdmin chỉ mở trên `127.0.0.1` của VPS. Muốn vào phpMyAdmin thì dùng SSH tunnel:
+Mở `http://<IP-VPS>` trên trình duyệt. MySQL và phpMyAdmin chỉ mở trên `127.0.0.1` của VPS. Muốn vào phpMyAdmin thì dùng SSH tunnel:
 
 ```bash
 ssh -L 8081:127.0.0.1:8081 my-vps-dev     # rồi mở http://127.0.0.1:8081 trên máy local
@@ -733,7 +774,8 @@ Trang web tự kết nối WebSocket bằng `wss` theo giao thức của trang.
 | `502 Bad Gateway` sau khi build lại | nginx giữ IP cũ của container `app` | `docker compose restart nginx` |
 | `Cannot connect to the Docker daemon` | Docker Desktop chưa chạy | Mở Docker Desktop, chờ báo "Engine running" |
 | `Access denied for user` khi lên lại DB | Volume DB cũ được tạo với mật khẩu khác trong `.env` | Đặt lại mật khẩu cũ, hoặc `docker compose down -v` (xoá dữ liệu) |
-| Lỗi `1207 Update locks cannot be acquired` | Lỗi MariaDB 10.4 với `ST_Contains` trên cột có spatial index | Đã sửa. Truy vấn không gian mới phải viết `ST_Contains(...) = 1` |
+| Dữ liệu cũ biến mất / MySQL không khởi động được với volume cũ sau khi chuyển DB | Dữ liệu cũ của MariaDB không mở được bằng MySQL 8.4 | Stack dùng volume mới `mysql-data` (CSDL trống): chạy lại `docker compose exec app php artisan db:seed --force`. Volume cũ `db-data` xoá bằng `docker volume rm disaster-warning_db-data` khi không cần |
+| phpMyAdmin XAMPP báo lỗi auth plugin khi đăng nhập MySQL 8.4 | Sai cổng / tài khoản, hoặc PHP thiếu extension `openssl` (MySQL 8.4 dùng `caching_sha2_password`; mysqli của PHP 8.2 tự trao đổi khoá RSA khi có `openssl`) | Chọn đúng máy chủ "MySQL 8.4 - du an (Docker :3307)", đăng nhập bằng user/mật khẩu trong `Infra/.env`, bật `extension=openssl` trong `C:\xampp\php\php.ini` rồi khởi động lại Apache |
 | Bản đồ xám, không có nền | Mạng chặn OpenFreeMap / OpenStreetMap, hoặc trình duyệt tắt WebGL | Kiểm tra mạng tới `tiles.openfreemap.org`. Một số nhà mạng VN chặn `*.openstreetmap.org` |
 | Không có banner / thông báo realtime | Thiếu `VITE_REVERB_APP_KEY`, sai `VITE_REVERB_URL`, hoặc `queue` không chạy | Đối chiếu mục 2.4 / 2.5, xem `docker compose logs queue reverb` |
 | Người dân không nhận cảnh báo | Chưa có vị trí quan tâm nằm trong vùng cảnh báo | Thêm vị trí ở Hồ sơ & vị trí (geofencing) |

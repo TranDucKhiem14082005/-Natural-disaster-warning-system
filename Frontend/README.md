@@ -12,7 +12,7 @@ Gọi REST API của [Backend](../Backend/README.md) (`/api/v1`, tài liệu: [b
 
 ### 1. Backend
 
-Bật **MySQL** trong XAMPP Control Panel, tạo database `disaster_warning` (utf8mb4_unicode_ci) trong phpMyAdmin.
+Chạy **MySQL 8.4** (Docker `Infra/` cổng 3307 hoặc MySQL Community Server 8.4 cài trên máy; module MySQL của XAMPP là MariaDB, không dùng), tạo database `disaster_warning` (utf8mb4_unicode_ci) bằng phpMyAdmin của XAMPP. Chi tiết: [Backend/README.md](../Backend/README.md).
 
 ```bash
 cd Backend
